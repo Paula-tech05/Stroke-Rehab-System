@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADJ's Tech Industries — Stroke Rehab Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #112240;
+    --navy-light: #1a3a5c;
+    --blue: #1e6fc8;
+    --blue-bright: #2d8cf0;
+    --blue-glow: #4da6ff;
+    --blue-pale: #e8f4ff;
+    --grey-100: #f4f6f9;
+    --grey-200: #e2e8f0;
+    --grey-300: #cbd5e1;
+    --grey-400: #94a3b8;
+    --grey-600: #475569;
+    --grey-800: #1e293b;
+    --white: #ffffff;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --sidebar-w: 260px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--grey-100); color: var(--grey-800); }
+
+  /* ===== PAGES ===== */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: flex; }
+
+  /* ===== LOGIN SELECTOR ===== */
+  #page-select {
+    background: var(--navy);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  #page-select::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(45,140,240,0.15) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    pointer-events: none;
+  }
+  #page-select::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(45,140,240,0.08) 0%, transparent 70%);
+    bottom: -50px; left: -50px;
+    pointer-events: none;
+  }
+  .select-logo {
+    text-align: center;
+    margin-bottom: 60px;
+    position: relative; z-index: 1;
+  }
+  .logo-badge {
+    width: 80px; height: 80px;
+    background: var(--blue);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 28px; font-weight: 800;
+    color: white;
+    margin: 0 auto 20px;
+    letter-spacing: -1px;
+  }
+  .select-logo h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: white;
+    letter-spacing: -0.5px;
+  }
+  .select-logo p {
+    font-size: 14px;
+    color: var(--grey-400);
+    margin-top: 6px;
+  }
+  .select-cards {
+    display: flex; gap: 24px;
+    position: relative; z-index: 1;
+  }
+  .select-card {
+    background: var(--navy-mid);
+    border: 1px solid rgba(45,140,240,0.2);
+    border-radius: 20px;
+    padding: 40px 36px;
+    width: 220px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .select-card:hover {
+    border-color: var(--blue-bright);
+    background: var(--navy-light);
+    transform: translateY(-4px);
+  }
+  .select-card-icon {
+    width: 60px; height: 60px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 26px;
+  }
+  .select-card-icon.doc { background: rgba(30,111,200,0.2); }
+  .select-card-icon.pat { background: rgba(16,185,129,0.2); }
+  .select-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px; font-weight: 700;
+    color: white; margin-bottom: 8px;
+  }
+  .select-card p { font-size: 13px; color: var(--grey-400); line-height: 1.5; }
+
+  /* ===== LOGIN PAGES ===== */
+  #page-login-doc, #page-login-pat {
+    background: var(--navy);
+    flex-direction: row;
+  }
+  .login-visual {
+    width: 45%;
+    background: var(--navy-mid);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 60px;
+    border-right: 1px solid rgba(45,140,240,0.1);
+    position: relative; overflow: hidden;
+  }
+  .login-visual::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(45,140,240,0.12) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .login-visual-content { position: relative; z-index: 1; text-align: center; }
+  .login-visual .logo-badge { width: 70px; height: 70px; font-size: 24px; border-radius: 18px; }
+  .login-visual h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px; font-weight: 800;
+    color: white; margin: 24px 0 12px;
+    letter-spacing: -0.5px;
+  }
+  .login-visual p { font-size: 14px; color: var(--grey-400); line-height: 1.7; max-width: 280px; }
+  .login-visual .role-pill {
+    display: inline-block;
+    background: rgba(45,140,240,0.15);
+    border: 1px solid rgba(45,140,240,0.3);
+    color: var(--blue-glow);
+    font-size: 12px; font-weight: 500;
+    padding: 6px 16px; border-radius: 20px;
+    margin-bottom: 24px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .login-form-side {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    padding: 60px;
+  }
+  .login-form-box { width: 100%; max-width: 360px; }
+  .login-form-box h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px; font-weight: 700;
+    color: white; margin-bottom: 8px;
+  }
+  .login-form-box .sub { font-size: 14px; color: var(--grey-400); margin-bottom: 36px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--grey-300); margin-bottom: 8px; }
+  .form-group input, .form-group select {
+    width: 100%; padding: 14px 16px;
+    background: var(--navy-mid);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    color: white; font-family: 'DM Sans', sans-serif; font-size: 14px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--blue-bright); }
+  .form-group input::placeholder { color: var(--grey-600); }
+  .form-group select option { background: var(--navy-mid); }
+  .btn-login {
+    width: 100%; padding: 15px;
+    background: var(--blue);
+    border: none; border-radius: 12px;
+    color: white; font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    margin-top: 8px; letter-spacing: 0.3px;
+  }
+  .btn-login:hover { background: var(--blue-bright); transform: translateY(-1px); }
+  .back-link {
+    text-align: center; margin-top: 20px;
+    font-size: 13px; color: var(--grey-400); cursor: pointer;
+  }
+  .back-link span { color: var(--blue-glow); }
+
+  /* ===== MAIN APP LAYOUT ===== */
+  #page-doctor, #page-patient {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--navy);
+    display: flex; flex-direction: column;
+    padding: 0;
+    position: fixed; top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+  .sidebar-logo {
+    padding: 28px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sidebar-logo .logo-sm {
+    width: 38px; height: 38px;
+    background: var(--blue); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; color: white;
+  }
+  .sidebar-logo-text h4 {
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: white;
+  }
+  .sidebar-logo-text p { font-size: 11px; color: var(--grey-400); }
+  .sidebar-nav { padding: 20px 12px; flex: 1; }
+  .nav-section-label {
+    font-size: 10px; font-weight: 500; color: var(--grey-600);
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 0 12px; margin: 16px 0 8px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; border-radius: 10px;
+    cursor: pointer; transition: all 0.2s;
+    margin-bottom: 2px; color: var(--grey-400);
+    font-size: 14px; font-weight: 400;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+  .nav-item.active { background: rgba(45,140,240,0.15); color: var(--blue-glow); }
+  .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .sidebar-user {
+    padding: 20px 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .user-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--blue); display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: white;
+  }
+  .user-info h5 { font-size: 13px; font-weight: 500; color: white; }
+  .user-info p { font-size: 11px; color: var(--grey-400); }
+  .logout-btn {
+    margin-left: auto; background: none; border: none;
+    color: var(--grey-600); cursor: pointer; font-size: 18px;
+    transition: color 0.2s;
+  }
+  .logout-btn:hover { color: var(--danger); }
+
+  /* ===== MAIN CONTENT ===== */
+  .main-content {
+    margin-left: var(--sidebar-w);
+    flex: 1; padding: 0;
+    background: var(--grey-100);
+    min-height: 100vh;
+  }
+  .topbar {
+    background: white;
+    padding: 20px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--grey-200);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px; font-weight: 700; color: var(--grey-800);
+  }
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .live-badge {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.2);
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 500; color: var(--success);
+  }
+  .live-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--success);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+  .content-body { padding: 28px 32px; }
+
+  /* ===== STAT CARDS ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px; margin-bottom: 28px;
+  }
+  .stat-card {
+    background: white; border-radius: 16px;
+    padding: 20px 22px;
+    border: 1px solid var(--grey-200);
+    position: relative; overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    border-radius: 16px 16px 0 0;
+  }
+  .stat-card.blue::before { background: var(--blue); }
+  .stat-card.green::before { background: var(--success); }
+  .stat-card.amber::before { background: var(--warning); }
+  .stat-card.red::before { background: var(--danger); }
+  .stat-label { font-size: 12px; color: var(--grey-400); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .stat-value { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; color: var(--grey-800); line-height: 1; margin-bottom: 6px; }
+  .stat-unit { font-size: 13px; color: var(--grey-400); }
+  .stat-status { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 12px; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .status-dot.ok { background: var(--success); }
+  .status-dot.warn { background: var(--warning); }
+  .status-dot.danger { background: var(--danger); }
+
+  /* ===== CHARTS ===== */
+  .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .chart-card {
+    background: white; border-radius: 16px;
+    border: 1px solid var(--grey-200); overflow: hidden;
+  }
+  .chart-header {
+    padding: 20px 24px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--grey-200);
+  }
+  .chart-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--grey-800); }
+  .chart-sub { font-size: 12px; color: var(--grey-400); margin-top: 2px; }
+  .chart-body { padding: 20px 24px; }
+
+  /* ===== BOTTOM GRID ===== */
+  .bottom-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+  /* ===== PATIENT PROFILE ===== */
+  .profile-card {
+    background: white; border-radius: 16px;
+    border: 1px solid var(--grey-200); overflow: hidden;
+  }
+  .profile-header {
+    background: var(--navy);
+    padding: 24px; text-align: center;
+  }
+  .profile-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--blue); display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: white;
+    margin: 0 auto 14px;
+  }
+  .profile-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: white; }
+  .profile-id { font-size: 12px; color: var(--grey-400); margin-top: 4px; }
+  .profile-body { padding: 20px; }
+  .profile-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--grey-100);
+    font-size: 13px;
+  }
+  .profile-row:last-child { border-bottom: none; }
+  .profile-row .label { color: var(--grey-400); }
+  .profile-row .value { font-weight: 500; color: var(--grey-800); }
+  .stroke-badge {
+    display: inline-block;
+    background: rgba(245,158,11,0.1); color: var(--warning);
+    border: 1px solid rgba(245,158,11,0.2);
+    font-size: 11px; font-weight: 500;
+    padding: 3px 10px; border-radius: 20px;
+  }
+
+  /* ===== ALERTS ===== */
+  .alerts-card {
+    background: white; border-radius: 16px;
+    border: 1px solid var(--grey-200); overflow: hidden;
+  }
+  .alerts-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--grey-200);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .alerts-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+  .alert-count {
+    background: var(--danger); color: white;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 20px;
+  }
+  .alert-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 20px; border-bottom: 1px solid var(--grey-100);
+    font-size: 13px;
+  }
+  .alert-item:last-child { border-bottom: none; }
+  .alert-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .alert-dot.high { background: var(--danger); }
+  .alert-dot.med { background: var(--warning); }
+  .alert-text { color: var(--grey-600); line-height: 1.5; }
+  .alert-time { font-size: 11px; color: var(--grey-400); margin-top: 3px; }
+
+  /* ===== MEDICATION ===== */
+  .med-card {
+    background: white; border-radius: 16px;
+    border: 1px solid var(--grey-200); overflow: hidden;
+  }
+  .med-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--grey-200);
+  }
+  .med-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+  .med-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 20px; border-bottom: 1px solid var(--grey-100);
+  }
+  .med-item:last-child { border-bottom: none; }
+  .med-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .med-icon.taken { background: rgba(16,185,129,0.1); }
+  .med-icon.pending { background: rgba(245,158,11,0.1); }
+  .med-icon.missed { background: rgba(239,68,68,0.1); }
+  .med-info { flex: 1; }
+  .med-name { font-size: 13px; font-weight: 500; color: var(--grey-800); }
+  .med-time { font-size: 12px; color: var(--grey-400); margin-top: 2px; }
+  .med-badge {
+    font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px;
+  }
+  .med-badge.taken { background: rgba(16,185,129,0.1); color: var(--success); }
+  .med-badge.pending { background: rgba(245,158,11,0.1); color: var(--warning); }
+  .med-badge.missed { background: rgba(239,68,68,0.1); color: var(--danger); }
+
+  /* ===== EXERCISE TRACKER ===== */
+  .exercise-card {
+    background: white; border-radius: 16px;
+    border: 1px solid var(--grey-200);
+    grid-column: span 3;
+    overflow: hidden;
+  }
+  .exercise-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--grey-200);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .exercise-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+  .exercise-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; padding: 20px 24px; }
+  .exercise-day {
+    text-align: center; padding: 14px 8px;
+    border-radius: 12px; border: 1px solid var(--grey-200);
+    transition: all 0.2s;
+  }
+  .exercise-day.completed { background: rgba(30,111,200,0.06); border-color: rgba(30,111,200,0.2); }
+  .exercise-day.today { background: var(--blue); border-color: var(--blue); }
+  .exercise-day.missed { background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.15); }
+  .ex-day-label { font-size: 11px; color: var(--grey-400); margin-bottom: 8px; }
+  .exercise-day.today .ex-day-label { color: rgba(255,255,255,0.7); }
+  .ex-duration { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--grey-800); }
+  .exercise-day.today .ex-duration { color: white; }
+  .exercise-day.missed .ex-duration { color: var(--danger); }
+  .ex-min { font-size: 10px; color: var(--grey-400); margin-top: 2px; }
+  .exercise-day.today .ex-min { color: rgba(255,255,255,0.6); }
+
+  /* ===== PATIENT DASHBOARD ===== */
+  .patient-hero {
+    background: var(--navy);
+    margin: -28px -32px 28px;
+    padding: 36px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .patient-welcome h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px; font-weight: 800; color: white; margin-bottom: 6px;
+  }
+  .patient-welcome p { font-size: 14px; color: var(--grey-400); }
+  .patient-vitals-quick {
+    display: flex; gap: 16px;
+  }
+  .quick-vital {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px; padding: 16px 20px; text-align: center; min-width: 110px;
+  }
+  .quick-vital .qv-label { font-size: 11px; color: var(--grey-400); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .quick-vital .qv-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: white; line-height: 1; }
+  .quick-vital .qv-unit { font-size: 11px; color: var(--grey-400); margin-top: 4px; }
+
+  .patient-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .patient-status-card {
+    background: white; border-radius: 16px;
+    border: 1px solid var(--grey-200); padding: 24px;
+  }
+  .patient-status-card h4 {
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    color: var(--grey-800); margin-bottom: 16px;
+  }
+  .vital-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid var(--grey-100);
+  }
+  .vital-row:last-child { border-bottom: none; }
+  .vital-row-left { display: flex; align-items: center; gap: 10px; }
+  .vital-row-icon {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .vital-row-icon.hr { background: rgba(239,68,68,0.1); }
+  .vital-row-icon.spo2 { background: rgba(30,111,200,0.1); }
+  .vital-row-icon.temp { background: rgba(245,158,11,0.1); }
+  .vital-row-icon.bp { background: rgba(16,185,129,0.1); }
+  .vital-row-name { font-size: 13px; color: var(--grey-600); }
+  .vital-row-value { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--grey-800); }
+  .vital-row-unit { font-size: 11px; color: var(--grey-400); font-family: 'DM Sans', sans-serif; font-weight: 400; }
+  .vital-tag {
+    font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px;
+  }
+  .vital-tag.normal { background: rgba(16,185,129,0.1); color: var(--success); }
+  .vital-tag.watch { background: rgba(245,158,11,0.1); color: var(--warning); }
+
+  .patient-summary-card {
+    background: white; border-radius: 16px;
+    border: 1px solid var(--grey-200); padding: 24px;
+  }
+  .patient-summary-card h4 {
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    color: var(--grey-800); margin-bottom: 16px;
+  }
+  .summary-message {
+    background: var(--blue-pale);
+    border: 1px solid rgba(30,111,200,0.2);
+    border-radius: 12px; padding: 16px;
+    font-size: 14px; color: var(--navy-light); line-height: 1.7;
+    margin-bottom: 16px;
+  }
+  .next-session {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--grey-100); border-radius: 12px; padding: 14px 16px;
+  }
+  .next-session-icon { font-size: 20px; }
+  .next-session-text h5 { font-size: 13px; font-weight: 500; color: var(--grey-800); }
+  .next-session-text p { font-size: 12px; color: var(--grey-400); margin-top: 2px; }
+
+  .patient-meds {
+    background: white; border-radius: 16px;
+    border: 1px solid var(--grey-200); padding: 24px;
+    grid-column: span 2;
+  }
+  .patient-meds h4 {
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    color: var(--grey-800); margin-bottom: 16px;
+  }
+  .patient-med-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .patient-med-item {
+    border: 1px solid var(--grey-200); border-radius: 12px; padding: 16px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .patient-med-top { display: flex; align-items: center; gap: 10px; }
+  .patient-med-icon { font-size: 20px; }
+  .patient-med-name { font-size: 13px; font-weight: 500; color: var(--grey-800); }
+  .patient-med-dose { font-size: 12px; color: var(--grey-400); }
+  .patient-med-time { font-size: 12px; color: var(--grey-600); }
+  .patient-confirm-btn {
+    width: 100%; padding: 10px;
+    background: var(--blue); border: none; border-radius: 8px;
+    color: white; font-size: 12px; font-weight: 500; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .patient-confirm-btn:hover { background: var(--blue-bright); }
+  .patient-confirm-btn.confirmed { background: rgba(16,185,129,0.1); color: var(--success); cursor: default; }
+
+  /* ECG Mini */
+  #ecg-canvas { width: 100%; height: 120px; display: block; }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: ROLE SELECTOR -->
+<div class="page active" id="page-select">
+  <div class="select-logo">
+    <div class="logo-badge">ADJ</div>
+    <h1>ADJ's Tech Industries</h1>
+    <p>Smart Stroke Rehabilitation Monitoring System</p>
+  </div>
+  <div class="select-cards">
+    <div class="select-card" onclick="goTo('page-login-doc')">
+      <div class="select-card-icon doc">🩺</div>
+      <h3>Clinician</h3>
+      <p>Access full patient data, graphs, and clinical management tools</p>
+    </div>
+    <div class="select-card" onclick="goTo('page-login-pat')">
+      <div class="select-card-icon pat">🧑‍⚕️</div>
+      <h3>Patient</h3>
+      <p>View your vitals, medication schedule, and recovery progress</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: DOCTOR LOGIN -->
+<div class="page" id="page-login-doc" style="flex-direction:row;">
+  <div class="login-visual">
+    <div class="login-visual-content">
+      <div class="logo-badge">ADJ</div>
+      <div class="role-pill">Clinician Portal</div>
+      <h2>Clinical Dashboard</h2>
+      <p>Access real-time patient vitals, ECG readings, rehabilitation progress, and clinical alerts in one unified interface.</p>
+    </div>
+  </div>
+  <div class="login-form-side">
+    <div class="login-form-box">
+      <h3>Welcome back</h3>
+      <p class="sub">Sign in to your clinician account</p>
+      <div class="form-group">
+        <label>Clinician ID</label>
+        <input type="text" placeholder="e.g. DR-ADJ-001" id="doc-id" value="DR-ADJ-001">
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" placeholder="Dr. Adaeze Johnson" id="doc-name" value="Dr. Adaeze Johnson">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••" value="password">
+      </div>
+      <button class="btn-login" onclick="loginDoctor()">Sign In as Clinician</button>
+      <div class="back-link" onclick="goTo('page-select')">← Back to <span>role selection</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: PATIENT LOGIN -->
+<div class="page" id="page-login-pat" style="flex-direction:row;">
+  <div class="login-visual">
+    <div class="login-visual-content">
+      <div class="logo-badge" style="background: var(--success);">ADJ</div>
+      <div class="role-pill" style="border-color:rgba(16,185,129,0.3); color:#10b981; background:rgba(16,185,129,0.1);">Patient Portal</div>
+      <h2>Your Health Hub</h2>
+      <p>Check your vitals, confirm medications, and track your rehabilitation journey simply and clearly.</p>
+    </div>
+  </div>
+  <div class="login-form-side">
+    <div class="login-form-box">
+      <h3>Hello there</h3>
+      <p class="sub">Sign in to your patient account</p>
+      <div class="form-group">
+        <label>Patient ID</label>
+        <input type="text" placeholder="e.g. PAT-001" id="pat-id" value="PAT-001">
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" placeholder="Your full name" id="pat-name" value="Chidinma Okafor">
+      </div>
+      <div class="form-group">
+        <label>Age</label>
+        <input type="number" placeholder="e.g. 58" id="pat-age" value="58">
+      </div>
+      <div class="form-group">
+        <label>Stroke Stage</label>
+        <select id="pat-stage">
+          <option value="acute">Acute (0–2 weeks)</option>
+          <option value="subacute" selected>Subacute (2 weeks – 6 months)</option>
+          <option value="chronic">Chronic (6+ months)</option>
+        </select>
+      </div>
+      <button class="btn-login" style="background:var(--success);" onclick="loginPatient()">Sign In as Patient</button>
+      <div class="back-link" onclick="goTo('page-select')">← Back to <span>role selection</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: DOCTOR DASHBOARD -->
+<div class="page" id="page-doctor" style="flex-direction:row;">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-sm">ADJ</div>
+      <div class="sidebar-logo-text">
+        <h4>ADJ's Tech</h4>
+        <p>Rehab Monitor v1.0</p>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-item"><span class="nav-icon">🫀</span> Vitals Monitor</div>
+      <div class="nav-item"><span class="nav-icon">📈</span> ECG Readings</div>
+      <div class="nav-section-label">Patient Care</div>
+      <div class="nav-item"><span class="nav-icon">🧑‍⚕️</span> Patient Profile</div>
+      <div class="nav-item"><span class="nav-icon">💊</span> Medications</div>
+      <div class="nav-item"><span class="nav-icon">🏋️</span> Rehab Sessions</div>
+      <div class="nav-section-label">System</div>
+      <div class="nav-item"><span class="nav-icon">🔔</span> Alerts</div>
+      <div class="nav-item"><span class="nav-icon">⚙️</span> Settings</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="doc-avatar">DA</div>
+      <div class="user-info">
+        <h5 id="doc-display-name">Dr. Adaeze</h5>
+        <p>Clinician</p>
+      </div>
+      <button class="logout-btn" onclick="goTo('page-select')" title="Logout">⏻</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <h2>Patient Overview</h2>
+        <div style="font-size:13px; color:var(--grey-400); margin-top:3px;" id="doc-datetime">Loading...</div>
+      </div>
+      <div class="topbar-right">
+        <div class="live-badge"><div class="live-dot"></div> Live Monitoring</div>
+      </div>
+    </div>
+
+    <div class="content-body">
+      <!-- STAT CARDS -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-label">Heart Rate</div>
+          <div class="stat-value" id="d-hr">76</div>
+          <div class="stat-unit">beats per minute</div>
+          <div class="stat-status"><div class="status-dot ok"></div><span style="font-size:12px;color:var(--grey-400)">Normal range</span></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Blood Oxygen (SpO2)</div>
+          <div class="stat-value" id="d-spo2">98</div>
+          <div class="stat-unit">percent saturation</div>
+          <div class="stat-status"><div class="status-dot ok"></div><span style="font-size:12px;color:var(--grey-400)">Normal range</span></div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Body Temperature</div>
+          <div class="stat-value" id="d-temp">36.7</div>
+          <div class="stat-unit">degrees celsius</div>
+          <div class="stat-status"><div class="status-dot ok"></div><span style="font-size:12px;color:var(--grey-400)">Normal range</span></div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Blood Pressure</div>
+          <div class="stat-value" id="d-bp" style="font-size:22px;">114/74</div>
+          <div class="stat-unit">mmHg systolic/diastolic</div>
+          <div class="stat-status"><div class="status-dot ok"></div><span style="font-size:12px;color:var(--grey-400)">Normal range</span></div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Heart Rate — Live Trend</div>
+              <div class="chart-sub">Last 20 readings • Updated every 2 seconds</div>
+            </div>
+          </div>
+          <div class="chart-body">
+            <div style="position:relative; height:200px;">
+              <canvas id="hrChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">SpO2 Trend</div>
+              <div class="chart-sub">Oxygen saturation %</div>
+            </div>
+          </div>
+          <div class="chart-body">
+            <div style="position:relative; height:200px;">
+              <canvas id="spo2Chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ECG -->
+      <div class="chart-card" style="margin-bottom:24px;">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">ECG — Cardiac Activity</div>
+            <div class="chart-sub">Real-time electrocardiogram from AD8232 sensor</div>
+          </div>
+          <div class="live-badge"><div class="live-dot"></div> Live</div>
+        </div>
+        <div class="chart-body" style="padding:16px 24px;">
+          <canvas id="ecg-canvas" height="100"></canvas>
+        </div>
+      </div>
+
+      <!-- BOTTOM GRID -->
+      <div class="bottom-grid">
+        <!-- Patient Profile -->
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="profile-avatar" id="pat-avatar-doc">CO</div>
+            <div class="profile-name" id="pat-display-name">Chidinma Okafor</div>
+            <div class="profile-id">PAT-001 • Active</div>
+          </div>
+          <div class="profile-body">
+            <div class="profile-row"><span class="label">Age</span><span class="value" id="pat-age-display">58 years</span></div>
+            <div class="profile-row"><span class="label">Stroke Stage</span><span class="value"><span class="stroke-badge">Subacute</span></span></div>
+            <div class="profile-row"><span class="label">Max HR Target</span><span class="value" id="pat-maxhr">97 BPM</span></div>
+            <div class="profile-row"><span class="label">Safe HR Range</span><span class="value">60–100 BPM</span></div>
+            <div class="profile-row"><span class="label">Assigned Doctor</span><span class="value" id="doc-name-display">Dr. Adaeze</span></div>
+            <div class="profile-row"><span class="label">Sessions This Week</span><span class="value">5 / 7</span></div>
+          </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="alerts-card">
+          <div class="alerts-header">
+            <div class="alerts-title">Recent Alerts</div>
+            <div class="alert-count" id="alert-count">3</div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-dot high"></div>
+            <div>
+              <div class="alert-text">Heart rate spiked to 138 BPM during morning exercise session</div>
+              <div class="alert-time">Today • 08:42 AM</div>
+            </div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-dot med"></div>
+            <div>
+              <div class="alert-text">SpO2 dipped to 93% briefly — returned to normal after rest</div>
+              <div class="alert-time">Today • 08:51 AM</div>
+            </div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-dot med"></div>
+            <div>
+              <div class="alert-text">Evening medication (Aspirin 100mg) not confirmed by patient</div>
+              <div class="alert-time">Yesterday • 08:00 PM</div>
+            </div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-dot" style="background:var(--grey-300)"></div>
+            <div>
+              <div class="alert-text">Temperature reading was 37.9°C — mild elevation, monitored</div>
+              <div class="alert-time">2 days ago • 03:15 PM</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Medication -->
+        <div class="med-card">
+          <div class="med-header">
+            <div class="med-title">Today's Medications</div>
+          </div>
+          <div class="med-item">
+            <div class="med-icon taken">💊</div>
+            <div class="med-info">
+              <div class="med-name">Aspirin 100mg</div>
+              <div class="med-time">8:00 AM</div>
+            </div>
+            <div class="med-badge taken">Taken</div>
+          </div>
+          <div class="med-item">
+            <div class="med-icon taken">💊</div>
+            <div class="med-info">
+              <div class="med-name">Atorvastatin 40mg</div>
+              <div class="med-time">8:00 AM</div>
+            </div>
+            <div class="med-badge taken">Taken</div>
+          </div>
+          <div class="med-item">
+            <div class="med-icon pending">⏳</div>
+            <div class="med-info">
+              <div class="med-name">Lisinopril 5mg</div>
+              <div class="med-time">2:00 PM</div>
+            </div>
+            <div class="med-badge pending">Pending</div>
+          </div>
+          <div class="med-item">
+            <div class="med-icon pending">⏳</div>
+            <div class="med-info">
+              <div class="med-name">Aspirin 100mg</div>
+              <div class="med-time">8:00 PM</div>
+            </div>
+            <div class="med-badge pending">Pending</div>
+          </div>
+        </div>
+
+        <!-- Exercise Tracker -->
+        <div class="exercise-card">
+          <div class="exercise-header">
+            <div class="exercise-title">Weekly Rehabilitation Sessions</div>
+            <div style="font-size:13px; color:var(--grey-400);">Duration in minutes per session</div>
+          </div>
+          <div class="exercise-grid">
+            <div class="exercise-day completed"><div class="ex-day-label">Mon</div><div class="ex-duration">18</div><div class="ex-min">mins</div></div>
+            <div class="exercise-day completed"><div class="ex-day-label">Tue</div><div class="ex-duration">22</div><div class="ex-min">mins</div></div>
+            <div class="exercise-day completed"><div class="ex-day-label">Wed</div><div class="ex-duration">20</div><div class="ex-min">mins</div></div>
+            <div class="exercise-day missed"><div class="ex-day-label">Thu</div><div class="ex-duration">—</div><div class="ex-min">missed</div></div>
+            <div class="exercise-day completed"><div class="ex-day-label">Fri</div><div class="ex-duration">25</div><div class="ex-min">mins</div></div>
+            <div class="exercise-day today"><div class="ex-day-label">Sat</div><div class="ex-duration">12</div><div class="ex-min">ongoing</div></div>
+            <div class="exercise-day"><div class="ex-day-label">Sun</div><div class="ex-duration">—</div><div class="ex-min">upcoming</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: PATIENT DASHBOARD -->
+<div class="page" id="page-patient" style="flex-direction:row;">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-sm" style="background:var(--success);">ADJ</div>
+      <div class="sidebar-logo-text">
+        <h4>ADJ's Tech</h4>
+        <p>Patient Portal</p>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-item active"><span class="nav-icon">🏠</span> My Dashboard</div>
+      <div class="nav-item"><span class="nav-icon">❤️</span> My Vitals</div>
+      <div class="nav-item"><span class="nav-icon">💊</span> Medications</div>
+      <div class="nav-item"><span class="nav-icon">🏋️</span> My Exercises</div>
+      <div class="nav-item"><span class="nav-icon">📋</span> My Progress</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" style="background:var(--success);" id="pat-avatar-side">CO</div>
+      <div class="user-info">
+        <h5 id="pat-display-name-side">Chidinma</h5>
+        <p>Patient</p>
+      </div>
+      <button class="logout-btn" onclick="goTo('page-select')" title="Logout">⏻</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <h2 id="pat-welcome-top">Good afternoon, Chidinma</h2>
+        <div style="font-size:13px; color:var(--grey-400); margin-top:3px;" id="pat-datetime">Loading...</div>
+      </div>
+      <div class="topbar-right">
+        <div class="live-badge" style="background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.2); color:var(--success);">
+          <div class="live-dot"></div> Monitoring Active
+        </div>
+      </div>
+    </div>
+
+    <div class="content-body">
+      <!-- Hero vitals strip -->
+      <div class="patient-hero">
+        <div class="patient-welcome">
+          <h2>You're doing great today!</h2>
+          <p>All your vitals are within normal range. Keep it up.</p>
+        </div>
+        <div class="patient-vitals-quick">
+          <div class="quick-vital">
+            <div class="qv-label">Heart Rate</div>
+            <div class="qv-value" id="p-hr">76</div>
+            <div class="qv-unit">BPM</div>
+          </div>
+          <div class="quick-vital">
+            <div class="qv-label">SpO2</div>
+            <div class="qv-value" id="p-spo2">98</div>
+            <div class="qv-unit">%</div>
+          </div>
+          <div class="quick-vital">
+            <div class="qv-label">Temp</div>
+            <div class="qv-value" id="p-temp">36.7</div>
+            <div class="qv-unit">°C</div>
+          </div>
+          <div class="quick-vital">
+            <div class="qv-label">B. Pressure</div>
+            <div class="qv-value" id="p-bp" style="font-size:18px;">114/74</div>
+            <div class="qv-unit">mmHg</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Patient content grid -->
+      <div class="patient-grid">
+        <div class="patient-status-card">
+          <h4>Your Vitals Right Now</h4>
+          <div class="vital-row">
+            <div class="vital-row-left">
+              <div class="vital-row-icon hr">❤️</div>
+              <div class="vital-row-name">Heart Rate</div>
+            </div>
+            <div style="display:flex; align-items:baseline; gap:4px;">
+              <div class="vital-row-value" id="p-hr2">76</div>
+              <div class="vital-row-unit">BPM</div>
+            </div>
+            <div class="vital-tag normal">Normal</div>
+          </div>
+          <div class="vital-row">
+            <div class="vital-row-left">
+              <div class="vital-row-icon spo2">🫁</div>
+              <div class="vital-row-name">Blood Oxygen</div>
+            </div>
+            <div style="display:flex; align-items:baseline; gap:4px;">
+              <div class="vital-row-value" id="p-spo22">98</div>
+              <div class="vital-row-unit">%</div>
+            </div>
+            <div class="vital-tag normal">Normal</div>
+          </div>
+          <div class="vital-row">
+            <div class="vital-row-left">
+              <div class="vital-row-icon temp">🌡️</div>
+              <div class="vital-row-name">Temperature</div>
+            </div>
+            <div style="display:flex; align-items:baseline; gap:4px;">
+              <div class="vital-row-value" id="p-temp2">36.7</div>
+              <div class="vital-row-unit">°C</div>
+            </div>
+            <div class="vital-tag normal">Normal</div>
+          </div>
+          <div class="vital-row">
+            <div class="vital-row-left">
+              <div class="vital-row-icon bp">💉</div>
+              <div class="vital-row-name">Blood Pressure</div>
+            </div>
+            <div style="display:flex; align-items:baseline; gap:4px;">
+              <div class="vital-row-value" id="p-bp2" style="font-size:16px;">114/74</div>
+              <div class="vital-row-unit">mmHg</div>
+            </div>
+            <div class="vital-tag normal">Normal</div>
+          </div>
+        </div>
+
+        <div class="patient-summary-card">
+          <h4>Doctor's Summary for Today</h4>
+          <div class="summary-message">
+            Your vitals are looking stable today. Your heart rate during this morning's exercise session was slightly elevated but came back to normal quickly — that is expected progress. Please remember to take your afternoon medication at 2:00 PM. Your next rehabilitation session is scheduled for this afternoon.
+          </div>
+          <div class="next-session">
+            <div class="next-session-icon">🏋️</div>
+            <div class="next-session-text">
+              <h5>Next Rehab Session</h5>
+              <p>Today at 3:00 PM — Hand flex exercises, 20 mins</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="patient-meds">
+          <h4>Today's Medications</h4>
+          <div class="patient-med-grid">
+            <div class="patient-med-item">
+              <div class="patient-med-top">
+                <div class="patient-med-icon">💊</div>
+                <div><div class="patient-med-name">Aspirin</div><div class="patient-med-dose">100mg</div></div>
+              </div>
+              <div class="patient-med-time">⏰ 8:00 AM</div>
+              <button class="patient-confirm-btn confirmed" disabled>Confirmed Taken</button>
+            </div>
+            <div class="patient-med-item">
+              <div class="patient-med-top">
+                <div class="patient-med-icon">💊</div>
+                <div><div class="patient-med-name">Atorvastatin</div><div class="patient-med-dose">40mg</div></div>
+              </div>
+              <div class="patient-med-time">⏰ 8:00 AM</div>
+              <button class="patient-confirm-btn confirmed" disabled>Confirmed Taken</button>
+            </div>
+            <div class="patient-med-item">
+              <div class="patient-med-top">
+                <div class="patient-med-icon">💊</div>
+                <div><div class="patient-med-name">Lisinopril</div><div class="patient-med-dose">5mg</div></div>
+              </div>
+              <div class="patient-med-time">⏰ 2:00 PM</div>
+              <button class="patient-confirm-btn" onclick="confirmMed(this)">Confirm Taken</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== NAVIGATION =====
+function goTo(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+}
+
+function loginDoctor() {
+  const name = document.getElementById('doc-name').value || 'Dr. Adaeze Johnson';
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('doc-avatar').textContent = initials;
+  document.getElementById('doc-display-name').textContent = name.split(' ')[0];
+  document.getElementById('doc-name-display').textContent = name;
+  const age = document.getElementById('pat-age').value || 58;
+  const maxHR = Math.round(220 - parseInt(age));
+  const safeHR = Math.round(maxHR * 0.6);
+  document.getElementById('pat-maxhr').textContent = safeHR + ' BPM';
+  document.getElementById('pat-age-display').textContent = age + ' years';
+  goTo('page-doctor');
+  startLiveData();
+}
+
+function loginPatient() {
+  const name = document.getElementById('pat-name').value || 'Chidinma Okafor';
+  const firstName = name.split(' ')[0];
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('pat-avatar-side').textContent = initials;
+  document.getElementById('pat-display-name-side').textContent = firstName;
+  document.getElementById('pat-avatar-doc').textContent = initials;
+  document.getElementById('pat-display-name').textContent = name;
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('pat-welcome-top').textContent = greeting + ', ' + firstName;
+  goTo('page-patient');
+  startLiveData();
+}
+
+function confirmMed(btn) {
+  btn.textContent = 'Confirmed Taken';
+  btn.classList.add('confirmed');
+  btn.disabled = true;
+}
+
+// ===== LIVE SIMULATION =====
+let hrChart, spo2Chart;
+const hrData = Array.from({length: 20}, () => Math.round(72 + Math.random() * 8));
+const spo2Data = Array.from({length: 20}, () => parseFloat((97.5 + Math.random()).toFixed(1)));
+const labels = Array.from({length: 20}, (_, i) => i === 19 ? 'now' : '-' + (19-i)*2 + 's');
+
+function initCharts() {
+  const hrCtx = document.getElementById('hrChart');
+  const spo2Ctx = document.getElementById('spo2Chart');
+  if (!hrCtx || !spo2Ctx) return;
+  if (hrChart) hrChart.destroy();
+  if (spo2Chart) spo2Chart.destroy();
+
+  hrChart = new Chart(hrCtx, {
+    type: 'line',
+    data: {
+      labels: [...labels],
+      datasets: [{
+        label: 'HR', data: [...hrData],
+        borderColor: '#1e6fc8', backgroundColor: 'rgba(30,111,200,0.08)',
+        borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { min: 50, max: 140, grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 11 } } },
+        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 }, maxTicksLimit: 5 } }
+      }
+    }
+  });
+
+  spo2Chart = new Chart(spo2Ctx, {
+    type: 'line',
+    data: {
+      labels: [...labels],
+      datasets: [{
+        label: 'SpO2', data: [...spo2Data],
+        borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.08)',
+        borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { min: 90, max: 100, grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 11 } } },
+        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 }, maxTicksLimit: 5 } }
+      }
+    }
+  });
+}
+
+function updateVitals() {
+  const hr = Math.round(72 + Math.random() * 12);
+  const spo2 = parseFloat((97 + Math.random() * 2).toFixed(1));
+  const temp = parseFloat((36.5 + Math.random() * 0.6).toFixed(1));
+  const sys = Math.round(108 + Math.random() * 14);
+  const dia = Math.round(68 + Math.random() * 10);
+  const bp = sys + '/' + dia;
+
+  ['d-hr','p-hr','p-hr2'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = hr; });
+  ['d-spo2','p-spo2','p-spo22'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = spo2; });
+  ['d-temp','p-temp','p-temp2'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = temp; });
+  ['d-bp','p-bp','p-bp2'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = bp; });
+
+  if (hrChart) {
+    hrChart.data.datasets[0].data.shift();
+    hrChart.data.datasets[0].data.push(hr);
+    hrChart.update('none');
+  }
+  if (spo2Chart) {
+    spo2Chart.data.datasets[0].data.shift();
+    spo2Chart.data.datasets[0].data.push(spo2);
+    spo2Chart.update('none');
+  }
+}
+
+// ECG simulation
+const ecgCanvas = document.getElementById('ecg-canvas');
+const ecgCtx = ecgCanvas ? ecgCanvas.getContext('2d') : null;
+let ecgData = Array(300).fill(0);
+let ecgX = 0;
+function generateECGSample(x) {
+  const cycle = x % 100;
+  if (cycle === 20) return 0.15;
+  if (cycle === 25) return -0.1;
+  if (cycle === 30) return 0.9;
+  if (cycle === 35) return -0.35;
+  if (cycle === 40) return 0.1;
+  if (cycle >= 55 && cycle <= 65) return 0.12 * Math.sin((cycle-55) * Math.PI / 10);
+  return (Math.random() - 0.5) * 0.04;
+}
+function drawECG() {
+  if (!ecgCtx) return;
+  const w = ecgCanvas.width = ecgCanvas.offsetWidth;
+  const h = ecgCanvas.height = 100;
+  ecgCtx.clearRect(0, 0, w, h);
+  ecgCtx.strokeStyle = '#2d8cf0';
+  ecgCtx.lineWidth = 1.5;
+  ecgCtx.beginPath();
+  const step = w / ecgData.length;
+  ecgData.forEach((v, i) => {
+    const x = i * step;
+    const y = h/2 - v * h * 0.42;
+    i === 0 ? ecgCtx.moveTo(x, y) : ecgCtx.lineTo(x, y);
+  });
+  ecgCtx.stroke();
+  ecgData.shift();
+  ecgData.push(generateECGSample(ecgX++));
+}
+
+function updateClock() {
+  const now = new Date();
+  const str = now.toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' }) + ' • ' + now.toLocaleTimeString();
+  const d = document.getElementById('doc-datetime');
+  const p = document.getElementById('pat-datetime');
+  if(d) d.textContent = str;
+  if(p) p.textContent = str;
+}
+
+let liveStarted = false;
+function startLiveData() {
+  if (liveStarted) return;
+  liveStarted = true;
+  setTimeout(() => { initCharts(); }, 100);
+  setInterval(updateVitals, 2000);
+  setInterval(drawECG, 30);
+  setInterval(updateClock, 1000);
+  updateClock();
+}
+</script>
+</body>
+</html>
