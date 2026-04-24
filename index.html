@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ADJ's Tech Industries — Stroke Rehab Monitor</title>
+<title>ADJ's Tech Final Year Project </title>
+   <link rel="icon" href="adj.png">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
@@ -589,15 +590,110 @@
 
   /* ECG Mini */
   #ecg-canvas { width: 100%; height: 120px; display: block; }
+
+  @media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .patient-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .patient-med-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .exercise-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: relative;
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .sidebar-nav {
+    display: flex;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .login-visual {
+    display: none;
+  }
+
+  .select-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exercise-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+  #preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0a1628;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+#preText {
+  font-family: 'Syne', sans-serif;
+  font-size: 40px;
+  color: #4da6ff;
+  letter-spacing: 3px;
+  animation: glow 1.5s infinite alternate;
+}
+
+@keyframes glow {
+  from { opacity: 0.4; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1.05); }
+}
+
+  
+    
 </style>
 </head>
 <body>
+
+  <div id="preloader">
+  <h1 id="preText">ADJ's Tech</h1>
+</div>
 
 <!-- PAGE 1: ROLE SELECTOR -->
 <div class="page active" id="page-select">
   <div class="select-logo">
     <div class="logo-badge">ADJ</div>
-    <h1>ADJ's Tech Industries</h1>
+    <h1>ADJ's Tech Final Year Project</h1>
     <p>Smart Stroke Rehabilitation Monitoring System</p>
   </div>
   <div class="select-cards">
@@ -1122,12 +1218,18 @@ function loginPatient() {
   document.getElementById('pat-welcome-top').textContent = greeting + ', ' + firstName;
   goTo('page-patient');
   startLiveData();
+  requestNotificationPermission();
 }
 
 function confirmMed(btn) {
   btn.textContent = 'Confirmed Taken';
   btn.classList.add('confirmed');
   btn.disabled = true;
+
+  // Save to localStorage
+  const meds = JSON.parse(localStorage.getItem("meds")) || {};
+  meds[btn.parentElement.querySelector('.patient-med-name').textContent] = "taken";
+  localStorage.setItem("meds", JSON.stringify(meds));
 }
 
 // ===== LIVE SIMULATION =====
@@ -1137,7 +1239,8 @@ const spo2Data = Array.from({length: 20}, () => parseFloat((97.5 + Math.random()
 const labels = Array.from({length: 20}, (_, i) => i === 19 ? 'now' : '-' + (19-i)*2 + 's');
 
 function initCharts() {
-  const hrCtx = document.getElementById('hrChart');
+ const hrCtx = document.getElementById('hrChart');
+if (!hrCtx) return;
   const spo2Ctx = document.getElementById('spo2Chart');
   if (!hrCtx || !spo2Ctx) return;
   if (hrChart) hrChart.destroy();
@@ -1210,8 +1313,16 @@ function updateVitals() {
 }
 
 // ECG simulation
-const ecgCanvas = document.getElementById('ecg-canvas');
-const ecgCtx = ecgCanvas ? ecgCanvas.getContext('2d') : null;
+let ecgCanvas, ecgCtx;
+
+function initECG() {
+  ecgCanvas = document.getElementById('ecg-canvas');
+  if (ecgCanvas) {
+    ecgCtx = ecgCanvas.getContext('2d');
+  }
+}
+
+  
 let ecgData = Array(300).fill(0);
 let ecgX = 0;
 function generateECGSample(x) {
@@ -1253,15 +1364,91 @@ function updateClock() {
 }
 
 let liveStarted = false;
+let intervals = [];
+  
 function startLiveData() {
   if (liveStarted) return;
   liveStarted = true;
-  setTimeout(() => { initCharts(); }, 100);
+
+  
+  setTimeout(() => { 
+  initCharts(); 
+  initECG(); // ✅ FIX
+}, 100);
+
+  
   setInterval(updateVitals, 2000);
+  setInterval(syncMedicationsToDoctor, 2000);
   setInterval(drawECG, 30);
   setInterval(updateClock, 1000);
   updateClock();
 }
+
+  // ===== MEDICATION REMINDER =====
+function requestNotificationPermission() {
+  if ("Notification" in window) {
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        startMedicationReminder();
+      }
+    });
+  }
+}
+
+function showMedicationNotification() {
+  // Only show on patient page
+  if (document.getElementById('page-patient').classList.contains('active')) {
+    new Notification("💊 Medication Reminder", {
+      body: "Time to take your medication!",
+      icon: "https://cdn-icons-png.flaticon.com/512/2966/2966485.png"
+    });
+
+    // vibration for mobile
+    if (navigator.vibrate) {
+      navigator.vibrate([200, 100, 200]);
+    }
+  }
+}
+
+function startMedicationReminder() {
+  setInterval(showMedicationNotification, 300000); // 5 mins
+}
+
+
+
+  window.addEventListener("load", () => {
+  setTimeout(() => {
+    document.getElementById("preloader").style.display = "none";
+  }, 4000); // 2 seconds
+});
+
+function syncMedicationsToDoctor() {
+  const meds = JSON.parse(localStorage.getItem("meds")) || {};
+
+  document.querySelectorAll('.med-item').forEach(item => {
+    const name = item.querySelector('.med-name').textContent;
+
+    if (meds[name] === "taken") {
+      item.querySelector('.med-badge').textContent = "Taken";
+      item.querySelector('.med-badge').className = "med-badge taken";
+    }
+  });
+}
+
+  function scrollToSection(id) {
+  const section = document.getElementById(id);
+  if (section) {
+    section.scrollIntoView({ behavior: "smooth" });
+  }
+}
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+  
 </script>
 </body>
 </html>
