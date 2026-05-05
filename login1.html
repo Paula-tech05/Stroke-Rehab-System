@@ -161,7 +161,7 @@ button:hover{
 <div class="login-box">
   <h2>Clinician Login</h2>
 
-  <input id="patientId" placeholder="Patient ID">
+  <input id="clinicianId" placeholder="Clinician ID">
   <input id="name" placeholder="Name">
 
   <div class="input-box">
@@ -184,7 +184,7 @@ button:hover{
 
 /* DOCTOR ACCOUNT */
 const doctorAccount = {
-  patientId: "DOC001",
+  clinicianId: "DOC001",
   name: "Dr. Adighije Chinonso",
   password: "1234"
 };
@@ -198,14 +198,14 @@ function togglePassword(){
 /* LOGIN */
 function login(){
 
-  const pid = document.getElementById("patientId").value;
+  const pid = document.getElementById("clinicianId").value;
   const name = document.getElementById("name").value;
   const pass = document.getElementById("password").value;
 
   const error = document.getElementById("error");
 
   if(
-    pid === doctorAccount.patientId &&
+    pid === doctorAccount.clinicianId &&
     name === doctorAccount.name &&
     pass === doctorAccount.password
   ){
