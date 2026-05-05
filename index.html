@@ -730,7 +730,7 @@
       </div>
       <div class="form-group">
         <label>Full Name</label>
-        <input type="text" placeholder="Dr. Adaeze Johnson" id="doc-name" value="Dr. Adaeze Johnson">
+        <input type="text" placeholder="Dr. Adighije Chinonso" id="doc-name" value="Dr. Adighije Chinonso">
       </div>
       <div class="form-group">
         <label>Password</label>
@@ -806,7 +806,7 @@
     <div class="sidebar-user">
       <div class="user-avatar" id="doc-avatar">DA</div>
       <div class="user-info">
-        <h5 id="doc-display-name">Dr. Adaeze</h5>
+        <h5 id="doc-display-name">Dr. Adighije Chinonso</h5>
         <p>Clinician</p>
       </div>
       <button class="logout-btn" onclick="goTo('page-select')" title="Logout">⏻</button>
@@ -1189,7 +1189,7 @@ function goTo(pageId) {
 }
 
 function loginDoctor() {
-  const name = document.getElementById('doc-name').value || 'Dr. Adaeze Johnson';
+  const name = document.getElementById('doc-name').value || 'Dr. Adighije Chinonso';
   const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
   document.getElementById('doc-avatar').textContent = initials;
   document.getElementById('doc-display-name').textContent = name.split(' ')[0];
@@ -1409,7 +1409,7 @@ function showMedicationNotification() {
 }
 
 function startMedicationReminder() {
-  setInterval(showMedicationNotification, 300000); // 5 mins
+  setInterval(showMedicationNotification, 10000); // 10 seconds 
 }
 
 
