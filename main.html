@@ -101,9 +101,13 @@ body{
 
 /* IMAGE INSIDE CARD */
 .card img{
-  width:80px;
-  height:80px;
-  margin-bottom:15px;
+  width:90px;
+  height:90px;
+  object-fit:cover;
+  border-radius:50%;
+  border:2px solid #38bdf8;
+  padding:3px;
+  background:white;
 }
 
 /* BUTTON STYLE INSIDE CARD */
@@ -149,24 +153,23 @@ body{
 
   <div class="card-container">
 
-    <!-- PATIENT CARD -->
-    <div class="card">
-      <img src="https://cdn-icons-png.flaticon.com/512/387/387561.png" alt="patient">
-      <h3>Patient Portal</h3>
-      <p>Access your health records and medications</p>
-      <a href="patient-login.html">Login as Patient</a>
-    </div>
-
-    <!-- DOCTOR CARD -->
-    <div class="card">
-      <img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png" alt="doctor">
-      <h3>Doctor Portal</h3>
-      <p>Manage and monitor patient health data</p>
-      <a href="doctor-login.html">Login as Doctor</a>
-    </div>
-
+  <!-- PATIENT CARD -->
+  <div class="card">
+    <img src="https://up.yimg.com/ib/th/id/OIP.GWjclUZB4kAJX8WzGENM0AHaEK?pid=Api&rs=1&c=1&qlt=95&w=200&h=112" alt="patient">
+    <h3>Patient Portal</h3>
+    <p>Access your health records and medications</p>
+    <a href="patient-login.html">Login as Patient</a>
   </div>
 
+  <!-- DOCTOR CARD -->
+  <div class="card">
+    <img src="https://s.yimg.com/fz/api/res/1.2/ai4acZydWyyc.3gldl0LUA--~C/YXBwaWQ9c3JjaGRkO2ZpPWZpbGw7aD00MTI7cHhvZmY9NTA7cHlvZmY9MTAwO3E9ODA7c3M9MTt3PTM4OA--/https://i.pinimg.com/736x/29/3b/b5/293bb5c342dbb64de73e141c92cc6186.jpg" alt="doctor">
+    <h3>Doctor Portal</h3>
+    <p>Manage and monitor patient health data</p>
+    <a href="doctor-login.html">Login as Doctor</a>
+  </div>
+
+</div>
 </div>
 
 <script>
