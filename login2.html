@@ -5,57 +5,227 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
   font-family:Arial;
-  background:#0f172a;
-  color:white;
+}
+
+body{
+  height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
+  background:linear-gradient(135deg,#0f172a,#020617);
+  color:white;
+  overflow:hidden;
 }
 
-.box{
-  background:#1e293b;
-  padding:30px;
-  border-radius:10px;
+/* GLOW */
+.bg-glow{
+  position:absolute;
+  width:300px;
+  height:300px;
+  background:#38bdf8;
+  filter:blur(120px);
+  opacity:0.3;
+  border-radius:50%;
+  top:10%;
+  left:20%;
+}
+
+/* LOGIN BOX */
+.login-box{
+  position:relative;
   width:90%;
-  max-width:400px;
+  max-width:420px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:15px;
+  padding:30px;
+  backdrop-filter:blur(15px);
+  box-shadow:0 10px 40px rgba(0,0,0,0.5);
+  animation:fadeIn 1s ease-in-out;
+  z-index:2;
 }
 
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(30px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+h2{
+  text-align:center;
+  margin-bottom:20px;
+  color:#38bdf8;
+}
+
+/* INPUT WRAPPER (for eye icon) */
+.input-box{
+  position:relative;
+}
+
+/* INPUT */
 input{
   width:100%;
-  padding:10px;
+  padding:12px;
   margin:10px 0;
+  border:none;
+  border-radius:8px;
+  outline:none;
+  background:rgba(255,255,255,0.08);
+  color:white;
 }
 
+input::placeholder{
+  color:#94a3b8;
+}
+
+/* EYE ICON */
+.eye{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  cursor:pointer;
+  font-size:18px;
+  color:#94a3b8;
+}
+
+/* BUTTON */
 button{
   width:100%;
-  padding:10px;
+  padding:12px;
+  margin-top:10px;
   background:#38bdf8;
   border:none;
+  border-radius:8px;
+  font-weight:bold;
   cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{
+  background:#0ea5e9;
+  transform:scale(1.03);
+}
+
+/* ERROR */
+#error{
+  color:#ff4d4d;
+  text-align:center;
+  margin-top:10px;
+  display:none;
+}
+
+/* SUCCESS ANIMATION SCREEN */
+.success-screen{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100vh;
+  background:#0f172a;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:999;
+}
+
+.checkmark{
+  font-size:80px;
+  color:#22c55e;
+  animation:pop 0.6s ease;
+}
+
+@keyframes pop{
+  0%{transform:scale(0);}
+  100%{transform:scale(1);}
+}
+
+.success-text{
+  margin-top:10px;
+  font-size:20px;
+  color:white;
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
+<div class="bg-glow"></div>
+
+<div class="login-box">
 <h2>Patient Login</h2>
 
 <input id="pid" placeholder="Patient ID">
 <input id="name" placeholder="Name">
-<input id="pass" type="password" placeholder="Password">
+
+<div class="input-box">
+  <input id="pass" type="password" placeholder="Password">
+  <span class="eye" onclick="togglePassword()">👁️</span>
+</div>
 
 <button onclick="login()">Login</button>
+
+<p id="error">Incorrect login details</p>
+</div>
+
+<!-- SUCCESS SCREEN -->
+<div class="success-screen" id="success">
+  <div class="checkmark">✔</div>
+  <div class="success-text">Login Successful...</div>
 </div>
 
 <script>
-function login(){
-  localStorage.setItem("patientId", document.getElementById("pid").value);
-  window.location.href="patient-dashboard.html";
+
+const API_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
+
+/* SHOW / HIDE PASSWORD */
+function togglePassword(){
+  const pass = document.getElementById("pass");
+  pass.type = pass.type === "password" ? "text" : "password";
 }
+
+/* LOGIN FUNCTION */
+async function login(){
+
+  const pid = document.getElementById("pid").value;
+  const name = document.getElementById("name").value;
+  const pass = document.getElementById("pass").value;
+
+  const error = document.getElementById("error");
+
+  const res = await fetch(API_URL);
+  const data = await res.json();
+
+  const user = data.find(p =>
+    p.patientId === pid &&
+    p.name === name &&
+    p.password === pass
+  );
+
+  if(user){
+    error.style.display = "none";
+
+    localStorage.setItem("patient", JSON.stringify(user));
+
+    // SHOW SUCCESS ANIMATION
+    document.querySelector(".login-box").style.display = "none";
+    document.getElementById("success").style.display = "flex";
+
+    // REDIRECT AFTER ANIMATION
+    setTimeout(()=>{
+      window.location.href = "patient.html";
+    },2000);
+
+  } else {
+    error.style.display = "block";
+  }
+}
+
 </script>
 
 </body>
