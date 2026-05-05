@@ -1,54 +1,149 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Doctor Login</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinician Portal</title>
 
 <style>
-body{
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
   font-family:Arial;
-  background:#0f172a;
-  color:white;
+}
+
+body{
+  height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
+  background:linear-gradient(135deg,#0f172a,#020617);
+  color:white;
 }
 
-.box{
-  background:#1e293b;
-  padding:30px;
-  border-radius:10px;
+/* BACKGROUND GLOW */
+.bg-glow{
+  position:absolute;
+  width:300px;
+  height:300px;
+  background:#38bdf8;
+  filter:blur(120px);
+  opacity:0.3;
+  border-radius:50%;
+  top:10%;
+  left:20%;
+}
+
+/* LOGIN CARD */
+.login-box{
+  position:relative;
   width:90%;
-  max-width:400px;
+  max-width:420px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:15px;
+  padding:30px;
+  backdrop-filter:blur(15px);
+  box-shadow:0 10px 40px rgba(0,0,0,0.5);
+  animation:fadeIn 1s ease-in-out;
 }
-input, button{
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(30px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+h2{
+  text-align:center;
+  margin-bottom:20px;
+  color:#38bdf8;
+}
+
+/* INPUT FIELDS */
+input{
   width:100%;
-  padding:10px;
+  padding:12px;
   margin:10px 0;
+  border:none;
+  border-radius:8px;
+  outline:none;
+  background:rgba(255,255,255,0.08);
+  color:white;
 }
+
+input::placeholder{
+  color:#94a3b8;
+}
+
+/* BUTTON */
 button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
   background:#38bdf8;
   border:none;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{
+  background:#0ea5e9;
+  transform:scale(1.03);
+}
+
+/* ERROR MESSAGE */
+#error{
+  color:#ff4d4d;
+  text-align:center;
+  margin-top:10px;
+  display:none;
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
-<h2>Doctor Login</h2>
+<div class="bg-glow"></div>
 
-<input placeholder="Patient ID (for access)">
-<input placeholder="Name">
-<input type="password" placeholder="Password">
+<div class="login-box">
+  <h2>Clinician Login</h2>
 
-<button onclick="login()">Login</button>
+  <input id="patientId" placeholder="Patient ID">
+  <input id="name" placeholder="Name">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="login()">Login</button>
+
+  <p id="error">❌ Incorrect login details</p>
 </div>
 
 <script>
+/* 🔐 DOCTOR LOGIN DATA (JS AUTH) */
+const doctorAccount = {
+  patientId: "DOC001",
+  name: "Dr. Adighije Chinonso",
+  password: "1234"
+};
+
 function login(){
-  window.location.href="doctor-dashboard.html";
+  const pid = document.getElementById("patientId").value;
+  const name = document.getElementById("name").value;
+  const pass = document.getElementById("password").value;
+
+  if(
+    pid === doctorAccount.patientId &&
+    name === doctorAccount.name &&
+    pass === doctorAccount.password
+  ){
+    // SUCCESS LOGIN
+    window.location.href = "doctor.html";
+  } else {
+    // ERROR
+    document.getElementById("error").style.display = "block";
+  }
 }
 </script>
 
