@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Patient Dashboard</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+  padding:20px;
+}
+
+.card{
+  background:#1e293b;
+  padding:15px;
+  margin:10px 0;
+  border-radius:10px;
+}
+
+.alert{
+  background:red;
+  padding:10px;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Patient Dashboard</h2>
+
+<div class="card">
+<h3>Vitals</h3>
+<p id="vitals">Loading...</p>
+</div>
+
+<div class="card">
+<h3>Medications</h3>
+<div id="meds"></div>
+</div>
+
+<div class="alert" id="alertBox">
+Medication Reminder System Active...
+</div>
+
+<script>
+// DEMO ALERT every 10 seconds
+setInterval(()=>{
+  alert("💊 Time to take your medication!");
+},10000);
+
+// Fake Google Sheet fetch (replace with Apps Script API)
+document.getElementById("vitals").innerText="BP: 120/80 | HR: 78";
+
+// Meds
+document.getElementById("meds").innerHTML=`
+<p>Paracetamol - 8am</p>
+<p>Vitamin C - 2pm</p>
+`;
+</script>
+
+</body>
+</html>
