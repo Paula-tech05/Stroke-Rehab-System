@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADJ TECH Health System</title>
+
+<style>
+body {
+  margin:0;
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+}
+
+/* PRELOADER */
+#preloader {
+  position:fixed;
+  width:100%;
+  height:100vh;
+  background:#0f172a;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+}
+
+.typing {
+  font-size:30px;
+  border-right:3px solid white;
+  white-space:nowrap;
+  overflow:hidden;
+  width:0;
+  animation: typing 3s steps(10) forwards;
+}
+
+@keyframes typing {
+  from { width:0 }
+  to { width:160px }
+}
+
+/* LANDING */
+.container {
+  display:none;
+  text-align:center;
+  padding:50px;
+}
+
+.btn {
+  padding:12px 20px;
+  margin:10px;
+  background:#38bdf8;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  color:black;
+  font-weight:bold;
+}
+
+.btn:hover {
+  background:#0ea5e9;
+}
+</style>
+</head>
+
+<body>
+
+<div id="preloader">
+  <div class="typing">ADJ TECH</div>
+</div>
+
+<div class="container">
+  <h1>Smart Health Monitoring System</h1>
+  <p>Choose your portal</p>
+
+  <a href="patient-login.html"><button class="btn">Patient Login</button></a>
+  <a href="doctor-login.html"><button class="btn">Doctor Login</button></a>
+</div>
+
+<script>
+setTimeout(()=>{
+  document.getElementById("preloader").style.display="none";
+  document.querySelector(".container").style.display="block";
+},3000);
+</script>
+
+</body>
+</html>
