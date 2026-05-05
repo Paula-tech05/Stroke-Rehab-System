@@ -6,15 +6,21 @@
 <title>ADJ TECH Health System</title>
 
 <style>
-body {
+*{
   margin:0;
-  font-family:Arial;
-  background:#0f172a;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+}
+
+body{
+  background:linear-gradient(135deg,#0f172a,#020617);
   color:white;
+  min-height:100vh;
 }
 
 /* PRELOADER */
-#preloader {
+#preloader{
   position:fixed;
   width:100%;
   height:100vh;
@@ -23,58 +29,144 @@ body {
   justify-content:center;
   align-items:center;
   flex-direction:column;
+  z-index:9999;
 }
 
-.typing {
-  font-size:30px;
+.typing{
+  font-size:32px;
+  font-weight:bold;
   border-right:3px solid white;
   white-space:nowrap;
   overflow:hidden;
   width:0;
-  animation: typing 3s steps(10) forwards;
+  animation:typing 3s steps(10) forwards;
+  letter-spacing:3px;
+  color:#38bdf8;
 }
 
-@keyframes typing {
-  from { width:0 }
-  to { width:160px }
+@keyframes typing{
+  from{width:0}
+  to{width:180px}
 }
 
-/* LANDING */
-.container {
+/* MAIN CONTAINER */
+.container{
   display:none;
+  padding:40px 20px;
   text-align:center;
-  padding:50px;
 }
 
-.btn {
-  padding:12px 20px;
-  margin:10px;
-  background:#38bdf8;
-  border:none;
-  border-radius:8px;
+/* HERO */
+.hero{
+  margin-bottom:30px;
+}
+
+.hero h1{
+  font-size:32px;
+  margin-bottom:10px;
+}
+
+.hero p{
+  color:#94a3b8;
+}
+
+/* CARD GRID */
+.card-container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+  margin-top:30px;
+  max-width:900px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* CARD STYLE */
+.card{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:15px;
+  padding:20px;
+  text-align:center;
+  transition:0.3s;
+  backdrop-filter:blur(10px);
   cursor:pointer;
-  color:black;
-  font-weight:bold;
 }
 
-.btn:hover {
+.card:hover{
+  transform:translateY(-10px);
+  border-color:#38bdf8;
+  box-shadow:0 10px 25px rgba(56,189,248,0.2);
+}
+
+/* IMAGE INSIDE CARD */
+.card img{
+  width:80px;
+  height:80px;
+  margin-bottom:15px;
+}
+
+/* BUTTON STYLE INSIDE CARD */
+.card a{
+  display:inline-block;
+  margin-top:10px;
+  padding:10px 15px;
+  background:#38bdf8;
+  color:black;
+  text-decoration:none;
+  border-radius:8px;
+  font-weight:bold;
+  transition:0.3s;
+}
+
+.card a:hover{
   background:#0ea5e9;
+}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .hero h1{
+    font-size:24px;
+  }
 }
 </style>
 </head>
 
 <body>
 
+<!-- PRELOADER -->
 <div id="preloader">
-  <div class="typing">ADJ TECH</div>
+  <div class="typing">ADJ'S TECH</div>
 </div>
 
+<!-- MAIN -->
 <div class="container">
-  <h1>Smart Health Monitoring System</h1>
-  <p>Choose your portal</p>
 
-  <a href="patient-login.html"><button class="btn">Patient Login</button></a>
-  <a href="doctor-login.html"><button class="btn">Doctor Login</button></a>
+  <div class="hero">
+    <h1>ADJ's Tech Final Year Project</h1>
+    <p>Smart Stroke Rehabilitation Monitoring System</p>
+  </div>
+
+  <div class="card-container">
+
+    <!-- PATIENT CARD -->
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/387/387561.png" alt="patient">
+      <h3>Patient Portal</h3>
+      <p>Access your health records and medications</p>
+      <a href="patient-login.html">Login as Patient</a>
+    </div>
+
+    <!-- DOCTOR CARD -->
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png" alt="doctor">
+      <h3>Doctor Portal</h3>
+      <p>Manage and monitor patient health data</p>
+      <a href="doctor-login.html">Login as Doctor</a>
+    </div>
+
+  </div>
+
 </div>
 
 <script>
