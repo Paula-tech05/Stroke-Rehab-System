@@ -2,62 +2,311 @@
 <html>
 <head>
 <title>Patient Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
   font-family:Arial;
+}
+
+body{
   background:#0f172a;
   color:white;
-  padding:20px;
+  padding:15px;
 }
 
+/* HEADER */
+.header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px;
+  background:rgba(255,255,255,0.05);
+  border-radius:12px;
+  margin-bottom:15px;
+  backdrop-filter:blur(10px);
+}
+
+.header h2{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  color:#38bdf8;
+  font-size:20px;
+}
+
+/* LIVE DOT */
+.live{
+  width:10px;
+  height:10px;
+  background:#22c55e;
+  border-radius:50%;
+  animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.6);}
+  100%{transform:scale(1);}
+}
+
+/* GRID (RESPONSIVE) */
+.container{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:15px;
+}
+
+/* DESKTOP */
+@media(min-width:768px){
+  .container{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+/* CARD */
 .card{
   background:#1e293b;
-  padding:15px;
-  margin:10px 0;
-  border-radius:10px;
+  padding:18px;
+  border-radius:14px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 
-.alert{
-  background:red;
+.card h3{
+  color:#38bdf8;
+  margin-bottom:12px;
+  font-size:16px;
+}
+
+/* VITALS TEXT */
+.vital-line{
+  margin:6px 0;
+  font-size:15px;
+}
+
+/* STATUS COLORS */
+.good{ color:#22c55e; font-weight:bold; }
+.bad{ color:#facc15; font-weight:bold; }
+.critical{ color:#ef4444; font-weight:bold; }
+
+/* MEDICATION */
+.med{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   padding:10px;
-  margin-top:10px;
+  margin-top:8px;
+  background:#0f172a;
+  border-radius:8px;
+  font-size:14px;
+}
+
+button{
+  padding:6px 10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:12px;
+}
+
+.taken{
+  background:#22c55e;
+}
+
+.done{
+  background:#64748b;
+  color:white;
+}
+
+/* NOTIFICATION TOAST */
+#notifyBox{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#22c55e;
+  padding:12px 15px;
+  border-radius:10px;
+  display:none;
+  box-shadow:0 5px 20px rgba(0,0,0,0.3);
 }
 </style>
 </head>
 
 <body>
 
-<h2>Patient Dashboard</h2>
-
-<div class="card">
-<h3>Vitals</h3>
-<p id="vitals">Loading...</p>
+<!-- HEADER -->
+<div class="header">
+  <span class="live"></span>
+  <h2>🧑‍⚕️ Patient Dashboard</h2>
+  <div></div>
 </div>
 
-<div class="card">
-<h3>Medications</h3>
-<div id="meds"></div>
+<!-- MAIN GRID -->
+<div class="container">
+
+  <!-- VITALS CARD -->
+  <div class="card">
+    <h3>🫀 Patient Vitals</h3>
+    <div id="vitals"></div>
+    <div id="status"></div>
+  </div>
+
+  <!-- SUMMARY CARD -->
+  <div class="card">
+    <h3>🩺 Doctor Summary</h3>
+    <div id="summary"></div>
+  </div>
+
+  <!-- MEDICATION CARD (FULL WIDTH ON MOBILE) -->
+  <div class="card" style="grid-column:1/-1;">
+    <h3>💊 Today's Medication</h3>
+    <div id="meds"></div>
+  </div>
+
 </div>
 
-<div class="alert" id="alertBox">
-Medication Reminder System Active...
-</div>
+<!-- NOTIFICATION -->
+<div id="notifyBox">💊 Take your medication!</div>
 
 <script>
-// DEMO ALERT every 10 seconds
-setInterval(()=>{
-  alert("💊 Time to take your medication!");
-},10000);
 
-// Fake Google Sheet fetch (replace with Apps Script API)
-document.getElementById("vitals").innerText="BP: 120/80 | HR: 78";
+const API_URL = "YOUR_GOOGLE_SHEET_API";
+const UPDATE_URL = "YOUR_GOOGLE_SCRIPT_UPDATE_URL";
 
-// Meds
-document.getElementById("meds").innerHTML=`
-<p>Paracetamol - 8am</p>
-<p>Vitamin C - 2pm</p>
-`;
+/* FALLBACK MEDS */
+let meds = [
+  {name:"Paracetamol", time:"8:00 AM", taken:false},
+  {name:"Vitamin C", time:"2:00 PM", taken:false},
+  {name:"Amoxicillin", time:"8:00 PM", taken:false}
+];
+
+/* STATUS LOGIC */
+function getStatus(hr, spo2, temp){
+
+  if(hr > 120 || spo2 < 92 || temp > 39){
+    return "CRITICAL";
+  }
+  if(hr > 100 || spo2 < 95 || temp > 37.5){
+    return "BAD";
+  }
+  return "GOOD";
+}
+
+/* LOAD DATA */
+async function loadData(){
+
+  try{
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    const p = data[0];
+
+    const status = getStatus(p.heartRate, p.spo2, p.temp);
+
+    document.getElementById("vitals").innerHTML = `
+      <div class="vital-line">❤️ Heart Rate: ${p.heartRate} bpm</div>
+      <div class="vital-line">🫁 SpO2: ${p.spo2}%</div>
+      <div class="vital-line">🌡 Temperature: ${p.temp}°C</div>
+      <div class="vital-line">🩸 Blood Pressure: ${p.bp}</div>
+    `;
+
+    document.getElementById("status").innerHTML =
+      status === "GOOD"
+      ? "<span class='good'>✔ Normal Condition</span>"
+      : status === "BAD"
+      ? "<span class='bad'>⚠ Needs Monitoring</span>"
+      : "<span class='critical'>🚨 Critical Condition</span>";
+
+    /* 🔥 BETTER DOCTOR SUMMARY */
+    document.getElementById("summary").innerText =
+      status === "GOOD"
+      ? "Your vital signs are within a healthy range. Continue your medications, stay hydrated, and maintain a balanced routine."
+      : status === "BAD"
+      ? "Some of your vital signs are outside the normal range. Please take your medications on time and monitor your condition closely."
+      : "Your vitals indicate a critical condition. Please seek immediate medical attention or contact your doctor urgently.";
+
+    if(p.meds) meds = p.meds;
+
+    renderMeds();
+
+  }catch(err){
+    renderMeds();
+  }
+}
+
+/* RENDER MEDICATION */
+function renderMeds(){
+
+  let box = document.getElementById("meds");
+  box.innerHTML = "";
+
+  meds.forEach((m,i)=>{
+
+    let div = document.createElement("div");
+    div.className = "med";
+
+    div.innerHTML = `
+      <span>${m.name} - ${m.time}</span>
+      <button class="${m.taken ? 'done' : 'taken'}"
+      onclick="markTaken(${i})"
+      ${m.taken ? "disabled" : ""}>
+      ${m.taken ? "Taken ✔" : "Take"}
+      </button>
+    `;
+
+    box.appendChild(div);
+  });
+}
+
+/* MARK AS TAKEN */
+function markTaken(i){
+
+  meds[i].taken = true;
+  renderMeds();
+
+  /* SEND TO GOOGLE SHEETS */
+  fetch(UPDATE_URL, {
+    method:"POST",
+    body: JSON.stringify({
+      index:i,
+      status:"taken"
+    })
+  });
+
+  alert("Medication marked as taken ✔");
+}
+
+/* NOTIFICATION SYSTEM */
+function notify(){
+
+  if("Notification" in window){
+
+    if(Notification.permission === "granted"){
+      new Notification("💊 Medication Reminder",{
+        body:"Time to take your medication"
+      });
+    }else if(Notification.permission !== "denied"){
+      Notification.requestPermission();
+    }
+
+  }else{
+    /* fallback */
+    const box = document.getElementById("notifyBox");
+    box.style.display = "block";
+    setTimeout(()=> box.style.display="none",3000);
+  }
+}
+
+/* RUN */
+loadData();
+setInterval(loadData,5000);
+setInterval(notify,10000);
+
 </script>
 
 </body>
