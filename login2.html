@@ -61,12 +61,11 @@ h2{
   color:#38bdf8;
 }
 
-/* INPUT WRAPPER (for eye icon) */
+/* INPUT */
 .input-box{
   position:relative;
 }
 
-/* INPUT */
 input{
   width:100%;
   padding:12px;
@@ -82,14 +81,13 @@ input::placeholder{
   color:#94a3b8;
 }
 
-/* EYE ICON */
+/* EYE */
 .eye{
   position:absolute;
   right:12px;
   top:50%;
   transform:translateY(-50%);
   cursor:pointer;
-  font-size:18px;
   color:#94a3b8;
 }
 
@@ -119,7 +117,7 @@ button:hover{
   display:none;
 }
 
-/* SUCCESS ANIMATION SCREEN */
+/* SUCCESS SCREEN */
 .success-screen{
   position:fixed;
   top:0;
@@ -148,7 +146,6 @@ button:hover{
 .success-text{
   margin-top:10px;
   font-size:20px;
-  color:white;
 }
 </style>
 </head>
@@ -170,7 +167,7 @@ button:hover{
 
 <button onclick="login()">Login</button>
 
-<p id="error">Incorrect login details</p>
+<p id="error">❌ Incorrect login details</p>
 </div>
 
 <!-- SUCCESS SCREEN -->
@@ -181,16 +178,21 @@ button:hover{
 
 <script>
 
-const API_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
+/* ✅ ONE PATIENT ACCOUNT ONLY */
+const patientAccount = {
+  patientId: "PAT001",
+  name: "Charity",
+  password: "1234"
+};
 
-/* SHOW / HIDE PASSWORD */
+/* SHOW/HIDE PASSWORD */
 function togglePassword(){
   const pass = document.getElementById("pass");
   pass.type = pass.type === "password" ? "text" : "password";
 }
 
-/* LOGIN FUNCTION */
-async function login(){
+/* LOGIN */
+function login(){
 
   const pid = document.getElementById("pid").value;
   const name = document.getElementById("name").value;
@@ -198,25 +200,19 @@ async function login(){
 
   const error = document.getElementById("error");
 
-  const res = await fetch(API_URL);
-  const data = await res.json();
+  if(
+    pid === patientAccount.patientId &&
+    name === patientAccount.name &&
+    pass === patientAccount.password
+  ){
 
-  const user = data.find(p =>
-    p.patientId === pid &&
-    p.name === name &&
-    p.password === pass
-  );
-
-  if(user){
     error.style.display = "none";
 
-    localStorage.setItem("patient", JSON.stringify(user));
+    localStorage.setItem("patient", JSON.stringify(patientAccount));
 
-    // SHOW SUCCESS ANIMATION
     document.querySelector(".login-box").style.display = "none";
     document.getElementById("success").style.display = "flex";
 
-    // REDIRECT AFTER ANIMATION
     setTimeout(()=>{
       window.location.href = "patient.html";
     },2000);
