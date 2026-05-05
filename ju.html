@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Doctor Dashboard</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+  padding:20px;
+}
+
+select, button{
+  padding:10px;
+  margin:10px 0;
+}
+
+.card{
+  background:#1e293b;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Doctor Dashboard</h2>
+
+<select id="patients">
+  <option>Select Patient</option>
+  <option>Patient 001</option>
+  <option>Patient 002</option>
+</select>
+
+<button onclick="loadData()">View Data</button>
+
+<div class="card" id="dataBox">
+Patient data will appear here...
+</div>
+
+<script>
+function loadData(){
+  let p = document.getElementById("patients").value;
+
+  document.getElementById("dataBox").innerHTML=`
+    <h3>${p}</h3>
+    <p>BP: 130/85</p>
+    <p>Heart Rate: 80</p>
+    <p>Medication: Active</p>
+  `;
+}
+</script>
+
+</body>
+</html>
