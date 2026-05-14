@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="ADJ.png">
+<link rel="icon" href="ADJ.png">
 <title>ADJ TECH Health System</title>
 
 <style>
@@ -18,9 +18,10 @@ body{
   background:linear-gradient(135deg,#0f172a,#020617);
   color:white;
   min-height:100vh;
+  overflow-x:hidden;
 }
 
-/* PRELOADER */
+/* ================= PRELOADER ================= */
 #preloader{
   position:fixed;
   width:100%;
@@ -33,21 +34,32 @@ body{
   z-index:9999;
 }
 
-.typing{
-  font-size:32px;
+/* LOGO TEXT */
+.loader-text{
+  font-size:40px;
   font-weight:bold;
-  border-right:3px solid white;
-  white-space:nowrap;
-  overflow:hidden;
-  width:0;
-  animation:typing 3s steps(3) forwards;
-  letter-spacing:3px;
+  letter-spacing:4px;
   color:#38bdf8;
+  animation:zoom 2s ease-in-out infinite;
+  text-shadow:0 0 20px rgba(56,189,248,0.7);
 }
 
-@keyframes typing{
-  from{width:0}
-  to{width:180px}
+/* ZOOM IN + OUT */
+@keyframes zoom{
+  0%{
+    transform:scale(0.7);
+    opacity:0.5;
+  }
+
+  50%{
+    transform:scale(1.2);
+    opacity:1;
+  }
+
+  100%{
+    transform:scale(0.7);
+    opacity:0.5;
+  }
 }
 
 /* MAIN CONTAINER */
@@ -55,6 +67,20 @@ body{
   display:none;
   padding:40px 20px;
   text-align:center;
+  animation:fadeIn 1s ease;
+}
+
+/* FADE ANIMATION */
+@keyframes fadeIn{
+  from{
+    opacity:0;
+    transform:translateY(20px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
 }
 
 /* HERO */
@@ -63,18 +89,20 @@ body{
 }
 
 .hero h1{
-  font-size:32px;
+  font-size:34px;
   margin-bottom:10px;
+  color:#38bdf8;
 }
 
 .hero p{
   color:#94a3b8;
+  font-size:16px;
 }
 
 /* CARD GRID */
 .card-container{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:20px;
   margin-top:30px;
   max-width:900px;
@@ -86,53 +114,78 @@ body{
 .card{
   background:rgba(255,255,255,0.05);
   border:1px solid rgba(255,255,255,0.1);
-  border-radius:15px;
-  padding:20px;
+  border-radius:18px;
+  padding:25px;
   text-align:center;
-  transition:0.3s;
-  backdrop-filter:blur(10px);
+  transition:0.4s;
+  backdrop-filter:blur(12px);
   cursor:pointer;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 
 .card:hover{
-  transform:translateY(-10px);
+  transform:translateY(-10px) scale(1.02);
   border-color:#38bdf8;
-  box-shadow:0 10px 25px rgba(56,189,248,0.2);
+  box-shadow:0 10px 30px rgba(56,189,248,0.3);
 }
 
-/* IMAGE INSIDE CARD */
+/* IMAGE */
 .card img{
-  width:90px;
-  height:90px;
+  width:100px;
+  height:100px;
   object-fit:cover;
-  border-radius:50%;
-  border:2px solid #38bdf8;
-  padding:3px;
-  background:white;
+  border-radius:15px;
+  border:3px solid #38bdf8;
+  margin-bottom:15px;
 }
 
-/* BUTTON STYLE INSIDE CARD */
+/* CARD TITLE */
+.card h3{
+  font-size:22px;
+  margin-bottom:10px;
+  color:#ffffff;
+}
+
+/* CARD TEXT */
+.card p{
+  color:#94a3b8;
+  margin-bottom:18px;
+  font-size:14px;
+  line-height:1.5;
+}
+
+/* BUTTON */
 .card a{
   display:inline-block;
-  margin-top:10px;
-  padding:10px 15px;
+  padding:12px 18px;
   background:#38bdf8;
   color:black;
   text-decoration:none;
-  border-radius:8px;
+  border-radius:10px;
   font-weight:bold;
   transition:0.3s;
 }
 
 .card a:hover{
   background:#0ea5e9;
+  transform:scale(1.05);
 }
 
 /* RESPONSIVE */
 @media(max-width:600px){
+
   .hero h1{
-    font-size:24px;
+    font-size:25px;
   }
+
+  .hero p{
+    font-size:14px;
+  }
+
+  .loader-text{
+    font-size:28px;
+  }
+
 }
 </style>
 </head>
@@ -141,10 +194,10 @@ body{
 
 <!-- PRELOADER -->
 <div id="preloader">
-  <div class="typing">ADJ'S TECH</div>
+  <div class="loader-text">ADJ'S TECH</div>
 </div>
 
-<!-- MAIN -->
+<!-- MAIN CONTENT -->
 <div class="container">
 
   <div class="hero">
@@ -154,30 +207,48 @@ body{
 
   <div class="card-container">
 
-  <!-- PATIENT CARD -->
-  <div class="card">
-    <img src="https://up.yimg.com/ib/th/id/OIP.GWjclUZB4kAJX8WzGENM0AHaEK?pid=Api&rs=1&c=1&qlt=95&w=200&h=112" alt="patient">
-    <h3>Patient Portal</h3>
-    <p>Access your health records and medications</p>
-    <a href="login2.html">Login as Patient</a>
-  </div>
+    <!-- PATIENT -->
+    <div class="card">
+      <img src="https://up.yimg.com/ib/th/id/OIP.GWjclUZB4kAJX8WzGENM0AHaEK?pid=Api&rs=1&c=1&qlt=95&w=200&h=112" alt="patient">
 
-  <!-- DOCTOR CARD -->
-  <div class="card">
-    <img src="a.jpg" alt="doctor">
-    <h3>Doctor Portal</h3>
-    <p>Manage and monitor patient health data</p>
-    <a href="login1.html">Login as Doctor</a>
-  </div>
+      <h3>Patient Portal</h3>
 
-</div>
+      <p>
+        Access your medications, monitor your vitals,
+        and receive real-time health reminders.
+      </p>
+
+      <a href="login2.html">Login as Patient</a>
+    </div>
+
+    <!-- DOCTOR -->
+    <div class="card">
+      <img src="a.jpg" alt="doctor">
+
+      <h3>Doctor Portal</h3>
+
+      <p>
+        Monitor patient vitals, ECG signals,
+        and medication updates in real-time.
+      </p>
+
+      <a href="login1.html">Login as Doctor</a>
+    </div>
+
+  </div>
 </div>
 
 <script>
+
+/* PRELOADER REMOVE */
 setTimeout(()=>{
+
   document.getElementById("preloader").style.display="none";
+
   document.querySelector(".container").style.display="block";
+
 },3000);
+
 </script>
 
 </body>
