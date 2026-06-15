@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <title>Doctor Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,339 +7,469 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
 }
 
-body{
-  background:#fff;
-  color:white;
-  padding:15px;
+body {
+  background: linear-gradient(135deg, #0f172a, #020617);
+  color: white;
+  padding: 15px;
+  min-height: 100vh;
 }
 
-/* ================= HEADER ================= */
-.header{
-  position:sticky;
-  top:0;
-  z-index:100;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  padding:14px 18px;
-  margin-bottom:20px;
-
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:14px;
-  backdrop-filter:blur(12px);
-
-  box-shadow:0 8px 25px rgba(0,0,0,0.3);
+/* HEADER */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
 }
 
-/* CENTER TITLE */
-.header h2{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-
-  font-size:22px;
-  color:#38bdf8;
-  white-space:nowrap;
+.header h2 {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22px;
+  color: #38bdf8;
+  white-space: nowrap;
 }
 
-/* LIVE BADGE */
-.live-indicator{
-  display:flex;
-  align-items:center;
-  gap:8px;
-
-  font-size:13px;
-  color:#94a3b8;
-
-  padding:6px 10px;
-  border-radius:20px;
-  background:rgba(56,189,248,0.08);
-  border:1px solid rgba(56,189,248,0.2);
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #94a3b8;
+  padding: 6px 10px;
+  border-radius: 20px;
+  background: rgba(56,189,248,0.08);
+  border: 1px solid rgba(56,189,248,0.2);
 }
 
-.live{
-  width:10px;
-  height:10px;
-  background:#22c55e;
-  border-radius:50%;
-  animation:pulse 1.2s infinite;
+.live {
+  width: 10px;
+  height: 10px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: pulse 1.2s infinite;
 }
 
-.right-space{
-  width:80px;
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-@keyframes pulse{
-  0%{transform:scale(1); opacity:1;}
-  50%{transform:scale(1.6); opacity:0.5;}
-  100%{transform:scale(1); opacity:1;}
+.right-space { width: 80px; }
+
+/* ALERT BANNER */
+#alertBanner {
+  display: none;
+  background: #ef4444;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  font-size: 15px;
+  animation: blink 1s infinite;
 }
 
-/* MOBILE */
-@media(max-width:600px){
-  .header h2{ font-size:16px; }
-  .right-space{ width:40px; }
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
 }
 
-/* ================= GRID ================= */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  gap:10px;
-  margin-top:15px;
+/* VITAL CARDS */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-/* CARD */
-.card{
-  background:#1e293b;
-  padding:12px;
-  border-radius:12px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.3);
+.card {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  border: 2px solid transparent;
+  transition: border-color 0.3s;
 }
 
-.card h3{
-  color:#38bdf8;
-  font-size:14px;
-  margin-bottom:6px;
-  display:flex;
-  align-items:center;
-  gap:6px;
+.card.normal { border-color: #22c55e; }
+.card.warning { border-color: #facc15; }
+.card.critical { border-color: #ef4444; }
+
+.card h3 {
+  color: #38bdf8;
+  font-size: 13px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.icon{
-  width:30px;
-  height:30px;
-  border-radius:6px;
+.card img {
+  width: 24px;
+  height: 24px;
 }
 
-.value{
-  font-size:18px;
-  font-weight:bold;
+.value {
+  font-size: 22px;
+  font-weight: bold;
 }
 
-/* ================= GRAPH SECTION ================= */
-.graph-container{
-  margin-top:20px;
-  display:grid;
-  gap:20px;
+.value.normal { color: #22c55e; }
+.value.warning { color: #facc15; }
+.value.critical { color: #ef4444; }
+
+.label {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 4px;
 }
 
-.graph-card{
-  background:#1e293b;
-  padding:15px;
-  border-radius:12px;
-  height:420px;
+/* LAST UPDATED */
+#lastUpdated {
+  text-align: center;
+  color: #64748b;
+  font-size: 12px;
+  margin-bottom: 15px;
 }
 
-.graph-card h3{
-  color:#38bdf8;
-  margin-bottom:10px;
-  font-size:16px;
+/* CHARTS */
+.graph-container {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
-/* RESPONSIVE CHART */
-canvas{
-  width:100% !important;
-  height:340px !important;
+.graph-card {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 12px;
 }
 
-/* ================= MEDICATION ================= */
-.med{
-  display:flex;
-  justify-content:space-between;
-  padding:10px;
-  background:#0f172a;
-  margin-top:8px;
-  border-radius:8px;
+.graph-card h3 {
+  color: #38bdf8;
+  margin-bottom: 10px;
+  font-size: 15px;
 }
 
-.taken{
-  background:#22c55e;
-  border:none;
-  padding:5px 10px;
-  border-radius:6px;
-  cursor:pointer;
+canvas {
+  width: 100% !important;
+  height: 200px !important;
+}
+
+/* MEDICATION */
+.med-card {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.med-card h3 {
+  color: #38bdf8;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.med {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #0f172a;
+  margin-top: 8px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.med-status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.med-status.taken { background: #22c55e; color: black; }
+.med-status.pending { background: #facc15; color: black; }
+
+/* RESPONSIVE */
+@media(max-width: 600px) {
+  .header h2 { font-size: 15px; }
+  .right-space { width: 40px; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- ================= HEADER ================= -->
+<!-- HEADER -->
 <div class="header">
-
   <div class="live-indicator">
     <span class="live"></span>
-    <span>LIVE MONITORING</span>
+    <span>LIVE</span>
   </div>
-
-  <h2>🩺 Doctor Monitoring System</h2>
-
+  <h2>🩺 Doctor Monitoring Dashboard</h2>
   <div class="right-space"></div>
 </div>
 
-<!-- ================= VITAL CARDS ================= -->
+<!-- ALERT BANNER -->
+<div id="alertBanner">🚨 ALERT: Abnormal vital signs detected! Immediate attention required.</div>
+
+<!-- LAST UPDATED -->
+<div id="lastUpdated">Last updated: --</div>
+
+<!-- VITAL CARDS -->
 <div class="grid">
 
-  <div class="card">
-    <h3><img class="icon" src="https://cdn-icons-png.flaticon.com/512/833/833472.png">Heart Rate</h3>
-    <div class="value" id="hr">-- bpm</div>
+  <div class="card" id="cardBPM">
+    <h3><img src="https://cdn-icons-png.flaticon.com/512/833/833472.png">Heart Rate</h3>
+    <div class="value" id="hr">--</div>
+    <div class="label">bpm | Normal: 60–100</div>
   </div>
 
-  <div class="card">
-    <h3><img class="icon" src="https://cdn-icons-png.flaticon.com/512/2966/2966480.png">SpO2</h3>
-    <div class="value" id="spo2">-- %</div>
+  <div class="card" id="cardSPO2">
+    <h3><img src="https://cdn-icons-png.flaticon.com/512/2966/2966480.png">SpO₂</h3>
+    <div class="value" id="spo2">--</div>
+    <div class="label">% | Normal: 95–100</div>
   </div>
 
-  <div class="card">
-    <h3><img class="icon" src="https://cdn-icons-png.flaticon.com/512/1684/1684375.png">Temperature</h3>
-    <div class="value" id="temp">-- °C</div>
-  </div>
-
-  <div class="card">
-    <h3><img class="icon" src="https://cdn-icons-png.flaticon.com/512/2936/2936886.png">Blood Pressure</h3>
-    <div class="value" id="bp">-- / --</div>
+  <div class="card" id="cardTEMP">
+    <h3><img src="https://cdn-icons-png.flaticon.com/512/1684/1684375.png">Temperature</h3>
+    <div class="value" id="temp">--</div>
+    <div class="label">°C | Normal: 36.1–37.2</div>
   </div>
 
 </div>
 
-<!-- ================= GRAPHS ================= -->
+<!-- CHARTS -->
 <div class="graph-container">
 
   <div class="graph-card">
-    <h3>📈 Heart Rate Trend (Last 20 readings)</h3>
+    <h3>📈 Heart Rate Trend — Last 20 Readings</h3>
     <canvas id="hrChart"></canvas>
   </div>
 
   <div class="graph-card">
-    <h3>⚡ ECG - Real Time Cardiac Activity</h3>
+    <h3>⚡ ECG — Real Time Cardiac Activity</h3>
     <canvas id="ecgChart"></canvas>
   </div>
 
 </div>
 
-<!-- ================= MEDICATION ================= -->
-<div class="card" style="margin-top:20px;">
-  <h3>💊 Medication</h3>
-  <div id="meds">No data loaded</div>
+<!-- MEDICATION -->
+<div class="med-card">
+  <h3>💊 Medication Schedule</h3>
+  <div id="meds">Loading...</div>
 </div>
 
 <script>
 
 const API_URL = "https://script.google.com/macros/s/AKfycbzDeeihEUPDvksADMXSER16FTRyj5uNVOAusr05FUP6dyJkdphT6VOSdmvwO5s1xqU/exec";
 
+// Alert thresholds
+const THRESHOLDS = {
+  bpmLow: 50,
+  bpmHigh: 120,
+  spo2Low: 90,
+  tempHigh: 37.8
+};
+
 let hrChart, ecgChart;
 
-/* INIT CHARTS */
-function initCharts(){
+// Initialise charts
+function initCharts() {
 
   hrChart = new Chart(document.getElementById("hrChart"), {
-    type:"line",
-    data:{
-      labels:[],
-      datasets:[{
-        label:"Heart Rate",
-        data:[],
-        borderColor:"#38bdf8",
-        tension:0.4,
-        fill:false
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [{
+        label: "Heart Rate (bpm)",
+        data: [],
+        borderColor: "#38bdf8",
+        backgroundColor: "rgba(56,189,248,0.1)",
+        tension: 0.4,
+        fill: true,
+        pointRadius: 3
       }]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: "white" } } },
+      scales: {
+        x: { ticks: { color: "#64748b" }, grid: { color: "rgba(255,255,255,0.05)" } },
+        y: { ticks: { color: "#64748b" }, grid: { color: "rgba(255,255,255,0.05)" } }
+      }
     }
   });
 
   ecgChart = new Chart(document.getElementById("ecgChart"), {
-    type:"line",
-    data:{
-      labels:[],
-      datasets:[{
-        label:"ECG",
-        data:[],
-        borderColor:"#22c55e",
-        tension:0.3,
-        fill:false
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [{
+        label: "ECG Signal",
+        data: [],
+        borderColor: "#22c55e",
+        backgroundColor: "rgba(34,197,94,0.05)",
+        tension: 0.2,
+        fill: true,
+        pointRadius: 0,
+        borderWidth: 1.5
       }]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      plugins: { legend: { labels: { color: "white" } } },
+      scales: {
+        x: { ticks: { display: false }, grid: { color: "rgba(255,255,255,0.05)" } },
+        y: { ticks: { color: "#64748b" }, grid: { color: "rgba(255,255,255,0.05)" } }
+      }
     }
   });
 }
 
-initCharts();
-
-/* LOAD DATA */
-async function loadData(){
-
-  const res = await fetch(API_URL);
-  const data = await res.json();
-
-  const patient = data[0]; // demo single patient
-
-  if(!patient) return;
-
-  document.getElementById("hr").innerText = patient.heartRate + " bpm";
-  document.getElementById("spo2").innerText = patient.spo2 + " %";
-  document.getElementById("temp").innerText = patient.temp + " °C";
-  document.getElementById("bp").innerText = patient.bp;
-
-  if(patient.trend){
-    hrChart.data.labels = patient.trend.map((_,i)=>i+1);
-    hrChart.data.datasets[0].data = patient.trend;
-    hrChart.update();
+// Get status based on value and thresholds
+function getStatus(type, value) {
+  if (type === "bpm") {
+    if (value < THRESHOLDS.bpmLow || value > THRESHOLDS.bpmHigh) return "critical";
+    if (value > 100) return "warning";
+    return "normal";
   }
-
-  if(patient.ecg){
-    ecgChart.data.labels = patient.ecg.map((_,i)=>i+1);
-    ecgChart.data.datasets[0].data = patient.ecg;
-    ecgChart.update();
+  if (type === "spo2") {
+    if (value < THRESHOLDS.spo2Low) return "critical";
+    if (value < 95) return "warning";
+    return "normal";
   }
-
-  renderMeds(patient.meds);
+  if (type === "temp") {
+    if (value > THRESHOLDS.tempHigh) return "critical";
+    if (value > 37.2) return "warning";
+    return "normal";
+  }
+  return "normal";
 }
 
-/* MEDICATION */
-function renderMeds(meds){
-  let box = document.getElementById("meds");
+// Apply colour to card and value
+function applyStatus(cardId, valueId, type, value, unit) {
+  const status = getStatus(type, value);
+  const card = document.getElementById(cardId);
+  const valueEl = document.getElementById(valueId);
+
+  card.className = "card " + status;
+  valueEl.className = "value " + status;
+  valueEl.innerText = value + " " + unit;
+}
+
+// Check if any alert needed
+function checkAlerts(bpm, spo2, temp) {
+  const banner = document.getElementById("alertBanner");
+  let alerts = [];
+
+  if (bpm < THRESHOLDS.bpmLow || bpm > THRESHOLDS.bpmHigh)
+    alerts.push("Heart Rate: " + bpm + " bpm");
+  if (spo2 < THRESHOLDS.spo2Low)
+    alerts.push("SpO₂: " + spo2 + "%");
+  if (temp > THRESHOLDS.tempHigh)
+    alerts.push("Temperature: " + temp + "°C");
+
+  if (alerts.length > 0) {
+    banner.style.display = "block";
+    banner.innerText = "🚨 ALERT — Abnormal readings detected: " + alerts.join(" | ");
+  } else {
+    banner.style.display = "none";
+  }
+}
+
+// Render medication
+function renderMeds(meds) {
+  const box = document.getElementById("meds");
   box.innerHTML = "";
 
-  meds.forEach((m,i)=>{
-    let div = document.createElement("div");
-    div.className="med";
-
-    div.innerHTML=`
-      <span>${m.name} - ${m.time}</span>
-      <button class="taken" onclick="markTaken(${i})">Taken</button>
+  meds.forEach(m => {
+    const div = document.createElement("div");
+    div.className = "med";
+    div.innerHTML = `
+      <span>${m.name}</span>
+      <span style="color:#64748b">${m.time}</span>
+      <span class="med-status ${m.taken ? 'taken' : 'pending'}">
+        ${m.taken ? "Taken ✔" : "Pending"}
+      </span>
     `;
-
     box.appendChild(div);
   });
 }
 
-function markTaken(i){
-  alert("Medication marked as taken ✔");
+// Load data from Google Sheets
+async function loadData() {
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+
+    const bpm = data.bpm || 0;
+    const spo2 = data.spo2 || 0;
+    const temp = data.temp || 0;
+    const ecg = data.ecg || [];
+    const bpmTrend = data.bpmTrend || [];
+    const meds = data.meds || [];
+
+    // Update vital cards with colour coding
+    applyStatus("cardBPM", "hr", "bpm", bpm, "bpm");
+    applyStatus("cardSPO2", "spo2", "spo2", spo2, "%");
+    applyStatus("cardTEMP", "temp", "temp", temp, "°C");
+
+    // Check alerts
+    checkAlerts(bpm, spo2, temp);
+
+    // Update heart rate trend chart
+    hrChart.data.labels = bpmTrend.map((_, i) => i + 1);
+    hrChart.data.datasets[0].data = bpmTrend;
+    hrChart.update();
+
+    // Update ECG chart
+    ecgChart.data.labels = ecg.map((_, i) => i + 1);
+    ecgChart.data.datasets[0].data = ecg;
+    ecgChart.update();
+
+    // Render medication
+    renderMeds(meds);
+
+    // Update timestamp
+    document.getElementById("lastUpdated").innerText =
+      "Last updated: " + (data.timestamp || new Date().toLocaleTimeString());
+
+  } catch (err) {
+    console.error("Failed to load data:", err);
+    document.getElementById("lastUpdated").innerText = "Connection error — retrying...";
+  }
 }
 
-/* AUTO UPDATE */
-setInterval(loadData,2000);
-
+// Start
+initCharts();
 loadData();
+setInterval(loadData, 5000);
 
 </script>
-
 </body>
 </html>
