@@ -1,140 +1,181 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <title>Patient Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-     <link rel="icon" href="ADJ.png">
-
+<link rel="icon" href="ADJ.png">
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
 
-body{
-  background:#0f172a;
-  color:white;
-  padding:15px;
-}
+body{background:#f1f5f9;color:#0f172a;padding:15px;min-height:100vh;}
 
-/* HEADER */
 .header{
-  position:sticky;
-  top:0;
-  z-index:100;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:14px;
-  background:rgba(255,255,255,0.05);
-  border-radius:12px;
-  margin-bottom:15px;
-  backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;margin-bottom:16px;
+  background:#ffffff;border:1px solid #e2e8f0;
+  border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,0.06);
+  position:sticky;top:0;z-index:100;
 }
 
-.header h2{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  color:#38bdf8;
-  font-size:20px;
+.header h2{color:#0f172a;font-size:17px;font-weight:600;}
+.header h2 span{color:#0ea5e9;}
+
+.live-badge{
+  display:flex;align-items:center;gap:7px;
+  font-size:12px;color:#64748b;
+  padding:5px 12px;border-radius:20px;
+  background:#f0fdf4;border:1px solid #bbf7d0;
 }
 
-/* LIVE DOT */
-.live{
-  width:10px;
-  height:10px;
-  background:#22c55e;
-  border-radius:50%;
-  animation:pulse 1s infinite;
+.dot{
+  width:7px;height:7px;background:#22c55e;
+  border-radius:50%;animation:pulse 1.2s infinite;
 }
 
 @keyframes pulse{
   0%{transform:scale(1);}
-  50%{transform:scale(1.6);}
+  50%{transform:scale(1.7);opacity:0.4;}
   100%{transform:scale(1);}
 }
 
-/* GRID (RESPONSIVE) */
-.container{
+.timestamp{
+  text-align:center;color:#94a3b8;
+  font-size:11px;margin-bottom:14px;
+}
+
+/* STATUS BANNER */
+.status-banner{
+  padding:14px 18px;border-radius:12px;
+  margin-bottom:16px;font-size:14px;
+  font-weight:600;text-align:center;
+  border:1px solid;
+}
+
+.status-banner.good{
+  background:#f0fdf4;color:#15803d;border-color:#bbf7d0;
+}
+
+.status-banner.warning{
+  background:#fefce8;color:#a16207;border-color:#fde68a;
+}
+
+.status-banner.critical{
+  background:#fef2f2;color:#b91c1c;border-color:#fecaca;
+  animation:blink 1.5s infinite;
+}
+
+@keyframes blink{
+  0%{opacity:1;}50%{opacity:0.7;}100%{opacity:1;}
+}
+
+/* VITAL CARDS */
+.grid{
   display:grid;
-  grid-template-columns:1fr;
-  gap:15px;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;margin-bottom:16px;
 }
 
-/* DESKTOP */
-@media(min-width:768px){
-  .container{
-    grid-template-columns:1fr 1fr;
-  }
-}
-
-/* CARD */
 .card{
-  background:#1e293b;
-  padding:18px;
-  border-radius:14px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.3);
+  background:#ffffff;border-radius:14px;
+  padding:16px 18px;border:1px solid #e2e8f0;
+  position:relative;overflow:hidden;
+  box-shadow:0 1px 4px rgba(0,0,0,0.05);
 }
 
-.card h3{
-  color:#38bdf8;
-  margin-bottom:12px;
-  font-size:16px;
+.card::after{
+  content:'';position:absolute;
+  bottom:0;left:0;right:0;height:3px;
 }
 
-/* VITALS TEXT */
-.vital-line{
-  margin:6px 0;
-  font-size:15px;
+.card.normal::after{background:#22c55e;}
+.card.warning::after{background:#facc15;}
+.card.critical::after{background:#ef4444;}
+.card.nodata::after{background:#94a3b8;}
+
+.card-label{
+  font-size:10px;color:#94a3b8;
+  text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;
 }
 
-/* STATUS COLORS */
-.good{ color:#22c55e; font-weight:bold; }
-.bad{ color:#facc15; font-weight:bold; }
-.critical{ color:#ef4444; font-weight:bold; }
+.card-value{
+  font-size:28px;font-weight:700;
+  color:#0f172a;line-height:1;margin-bottom:4px;
+}
+
+.card-unit{font-size:12px;font-weight:400;color:#64748b;margin-left:2px;}
+
+.card-sub{font-size:10px;margin-top:4px;}
+.card.normal .card-sub{color:#16a34a;}
+.card.warning .card-sub{color:#ca8a04;}
+.card.critical .card-sub{color:#dc2626;}
+.card.nodata .card-sub{color:#94a3b8;}
+
+/* SECTION */
+.section{
+  background:#ffffff;border-radius:14px;
+  padding:16px 18px;margin-bottom:14px;
+  border:1px solid #e2e8f0;
+  box-shadow:0 1px 4px rgba(0,0,0,0.05);
+}
+
+.section-title{
+  font-size:11px;color:#0ea5e9;font-weight:700;
+  margin-bottom:12px;text-transform:uppercase;
+  letter-spacing:1px;display:flex;align-items:center;gap:8px;
+}
+
+.section-title::after{
+  content:'';flex:1;height:1px;background:#e0f2fe;
+}
 
 /* MEDICATION */
-.med{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:10px;
-  margin-top:8px;
-  background:#0f172a;
-  border-radius:8px;
-  font-size:14px;
+.med-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 14px;background:#f8fafc;
+  border-radius:10px;margin-bottom:8px;
+  border:1px solid #f1f5f9;
 }
 
-button{
-  padding:6px 10px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:12px;
+.med-info{display:flex;flex-direction:column;gap:3px;}
+.med-name{font-size:14px;color:#0f172a;font-weight:600;}
+.med-time{font-size:12px;color:#64748b;}
+
+.btn-take{
+  padding:8px 16px;background:#0ea5e9;
+  color:white;border:none;border-radius:8px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  transition:background 0.2s;
 }
 
-.taken{
-  background:#22c55e;
+.btn-take:hover{background:#0284c7;}
+.btn-take:disabled{background:#94a3b8;cursor:not-allowed;}
+
+.badge{
+  font-size:10px;font-weight:700;
+  padding:4px 10px;border-radius:6px;
+  text-transform:uppercase;
 }
 
-.done{
-  background:#64748b;
-  color:white;
+.badge.taken{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;}
+
+/* SUMMARY */
+.summary-text{
+  font-size:14px;color:#475569;
+  line-height:1.7;padding:4px 0;
 }
 
 /* NOTIFICATION TOAST */
 #notifyBox{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#22c55e;
-  padding:12px 15px;
-  border-radius:10px;
-  display:none;
-  box-shadow:0 5px 20px rgba(0,0,0,0.3);
+  position:fixed;bottom:20px;right:20px;
+  background:#0ea5e9;color:white;
+  padding:14px 18px;border-radius:12px;
+  display:none;box-shadow:0 5px 20px rgba(0,0,0,0.2);
+  font-size:13px;font-weight:600;z-index:999;
+  max-width:280px;
+}
+
+@media(max-width:600px){
+  .header h2{font-size:14px;}
 }
 </style>
 </head>
@@ -143,172 +184,275 @@ button{
 
 <!-- HEADER -->
 <div class="header">
-  <span class="live"></span>
-  <h2>🧑‍⚕️ Patient Dashboard</h2>
-  <div></div>
+  <div class="live-badge"><span class="dot"></span>Live</div>
+  <h2>Patient <span>Health</span> Dashboard</h2>
+  <div style="width:60px;"></div>
 </div>
 
-<!-- MAIN GRID -->
-<div class="container">
+<!-- TIMESTAMP -->
+<div class="timestamp" id="lastUpdated">Last updated: --</div>
 
-  <!-- VITALS CARD -->
-  <div class="card">
-    <h3>❤️ Patient Vitals</h3>
-    <div id="vitals"></div>
-    <div id="status"></div>
+<!-- STATUS BANNER -->
+<div class="status-banner good" id="statusBanner">
+  ✔ Your vital signs are within normal range
+</div>
+
+<!-- VITAL CARDS -->
+<div class="grid">
+
+  <div class="card nodata" id="cardBPM">
+    <div class="card-label">Heart Rate</div>
+    <div class="card-value" id="hr">--<span class="card-unit">bpm</span></div>
+    <div class="card-sub" id="subBPM">Normal: 60–100 bpm</div>
   </div>
 
-  <!-- SUMMARY CARD -->
-  <div class="card">
-    <h3>🩺 Doctor Summary</h3>
-    <div id="summary"></div>
+  <div class="card nodata" id="cardSPO2">
+    <div class="card-label">SpO₂</div>
+    <div class="card-value" id="spo2">--<span class="card-unit">%</span></div>
+    <div class="card-sub" id="subSPO2">Normal: 95–100%</div>
   </div>
 
-  <!-- MEDICATION CARD (FULL WIDTH ON MOBILE) -->
-  <div class="card" style="grid-column:1/-1;">
-    <h3>💊 Today's Medication</h3>
-    <div id="meds"></div>
+  <div class="card nodata" id="cardTEMP">
+    <div class="card-label">Temperature</div>
+    <div class="card-value" id="temp">--<span class="card-unit">°C</span></div>
+    <div class="card-sub" id="subTEMP">Normal: 36.1–37.2°C</div>
   </div>
 
 </div>
 
-<!-- NOTIFICATION -->
-<div id="notifyBox">💊 Take your medication!</div>
+<!-- DOCTOR SUMMARY -->
+<div class="section">
+  <div class="section-title">Doctor Summary</div>
+  <div class="summary-text" id="summary">
+    Loading your health summary...
+  </div>
+</div>
+
+<!-- MEDICATION -->
+<div class="section">
+  <div class="section-title">Today's Medication</div>
+  <div id="meds">Loading medications...</div>
+</div>
+
+<!-- NOTIFICATION TOAST -->
+<div id="notifyBox">💊 Time to take your medication!</div>
 
 <script>
 
 const API_URL = "https://script.google.com/macros/s/AKfycbzDeeihEUPDvksADMXSER16FTRyj5uNVOAusr05FUP6dyJkdphT6VOSdmvwO5s1xqU/exec";
-const UPDATE_URL = "YOUR_GOOGLE_SCRIPT_UPDATE_URL";
 
-/* FALLBACK MEDS */
-let meds = [
-  {name:"Paracetamol", time:"8:00 AM", taken:false},
-  {name:"Vitamin C", time:"2:00 PM", taken:false},
-  {name:"Amoxicillin", time:"8:00 PM", taken:false}
+const THRESHOLDS = {
+  bpmLow: 50,
+  bpmHigh: 120,
+  spo2Low: 90,
+  spo2Warn: 95,
+  tempHigh: 37.8,
+  tempWarn: 37.2
+};
+
+// Default medications — updated from Google Sheets when available
+let medications = [
+  { name: "Aspirin", time: "08:00", taken: false },
+  { name: "Lisinopril", time: "14:00", taken: false },
+  { name: "Atorvastatin", time: "20:00", taken: false }
 ];
 
-/* STATUS LOGIC */
-function getStatus(hr, spo2, temp){
-
-  if(hr > 120 || spo2 < 92 || temp > 39){
-    return "CRITICAL";
-  }
-  if(hr > 100 || spo2 < 95 || temp > 37.5){
-    return "BAD";
-  }
-  return "GOOD";
+// Request notification permission
+if ("Notification" in window && Notification.permission !== "granted")
+{
+  Notification.requestPermission();
 }
 
-/* LOAD DATA */
-async function loadData(){
+function getStatus(bpm, spo2, temp)
+{
+  if (bpm > 0 && (bpm < THRESHOLDS.bpmLow || bpm > THRESHOLDS.bpmHigh)) return "critical";
+  if (spo2 > 0 && spo2 < THRESHOLDS.spo2Low) return "critical";
+  if (temp > 0 && temp > THRESHOLDS.tempHigh) return "critical";
+  if (bpm > 100) return "warning";
+  if (spo2 > 0 && spo2 < THRESHOLDS.spo2Warn) return "warning";
+  if (temp > 0 && temp > THRESHOLDS.tempWarn) return "warning";
+  return "good";
+}
 
-  try{
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    const p = data[0];
+function applyCard(cardId, valueId, subId, type, value, unit)
+{
+  let status = "nodata";
+  if (value > 0)
+  {
+    if (type === "bpm") {
+      if (value < THRESHOLDS.bpmLow || value > THRESHOLDS.bpmHigh) status = "critical";
+      else if (value > 100) status = "warning";
+      else status = "normal";
+    }
+    if (type === "spo2") {
+      if (value < THRESHOLDS.spo2Low) status = "critical";
+      else if (value < THRESHOLDS.spo2Warn) status = "warning";
+      else status = "normal";
+    }
+    if (type === "temp") {
+      if (value > THRESHOLDS.tempHigh) status = "critical";
+      else if (value > THRESHOLDS.tempWarn) status = "warning";
+      else status = "normal";
+    }
+  }
 
-    const status = getStatus(p.heartRate, p.spo2, p.temp);
+  const card = document.getElementById(cardId);
+  const valueEl = document.getElementById(valueId);
+  const subEl = document.getElementById(subId);
 
-    document.getElementById("vitals").innerHTML = `
-      <div class="vital-line">❤️ Heart Rate: ${p.heartRate} bpm</div>
-      <div class="vital-line">🫁 SpO2: ${p.spo2}%</div>
-      <div class="vital-line">🌡 Temperature: ${p.temp}°C</div>
-      <div class="vital-line">🩸 Blood Pressure: ${p.bp}</div>
-    `;
+  card.className = "card " + status;
+  valueEl.innerHTML = (value === 0 ? "--" : value) + `<span class="card-unit">${unit}</span>`;
 
-    document.getElementById("status").innerHTML =
-      status === "GOOD"
-      ? "<span class='good'>✔ Normal Condition</span>"
-      : status === "BAD"
-      ? "<span class='bad'>⚠ Needs Monitoring</span>"
-      : "<span class='critical'>🚨 Critical Condition</span>";
+  const subTexts = {
+    normal: { bpm: "✓ Normal", spo2: "✓ Normal", temp: "✓ Normal" },
+    warning: { bpm: "⚠ Elevated", spo2: "⚠ Low", temp: "⚠ Elevated" },
+    critical: { bpm: "⚠ Critical", spo2: "⚠ Critical", temp: "⚠ Critical" },
+    nodata: { bpm: "Waiting...", spo2: "Waiting...", temp: "Waiting..." }
+  };
 
-    /* 🔥 BETTER DOCTOR SUMMARY */
-    document.getElementById("summary").innerText =
-      status === "GOOD"
-      ? "Your vital signs are within a healthy range. Continue your medications, stay hydrated, and maintain a balanced routine."
-      : status === "BAD"
-      ? "Some of your vital signs are outside the normal range. Please take your medications on time and monitor your condition closely."
-      : "Your vitals indicate a critical condition. Please seek immediate medical attention or contact your doctor urgently.";
+  subEl.innerText = subTexts[status][type];
+}
 
-    if(p.meds) meds = p.meds;
+function updateStatusBanner(bpm, spo2, temp)
+{
+  const banner = document.getElementById("statusBanner");
+  const summary = document.getElementById("summary");
+  const overall = getStatus(bpm, spo2, temp);
 
-    renderMeds();
-
-  }catch(err){
-    renderMeds();
+  if (overall === "critical")
+  {
+    banner.className = "status-banner critical";
+    banner.innerText = "🚨 Critical — Please seek immediate medical attention";
+    summary.innerText = "Your vital signs indicate a critical condition. Please contact your doctor or go to the nearest hospital immediately. Do not delay.";
+  }
+  else if (overall === "warning")
+  {
+    banner.className = "status-banner warning";
+    banner.innerText = "⚠ Some readings need attention — Please take your medications";
+    summary.innerText = "Some of your vital signs are slightly outside the normal range. Please ensure you take your medications on time, rest adequately, and avoid strenuous activity. Contact your doctor if you feel unwell.";
+  }
+  else
+  {
+    banner.className = "status-banner good";
+    banner.innerText = "✔ Your vital signs are within normal range";
+    summary.innerText = "Your vital signs are looking good. Continue taking your medications as prescribed, stay hydrated, eat well, and follow your rehabilitation exercises regularly. Keep up the good work!";
   }
 }
 
-/* RENDER MEDICATION */
-function renderMeds(){
-
-  let box = document.getElementById("meds");
+function renderMeds()
+{
+  const box = document.getElementById("meds");
   box.innerHTML = "";
 
-  meds.forEach((m,i)=>{
+  if (medications.length === 0)
+  {
+    box.innerHTML = "<p style='color:#94a3b8;font-size:13px;'>No medications prescribed yet.</p>";
+    return;
+  }
 
-    let div = document.createElement("div");
-    div.className = "med";
-
+  medications.forEach((m, i) => {
+    const div = document.createElement("div");
+    div.className = "med-row";
     div.innerHTML = `
-      <span>${m.name} - ${m.time}</span>
-      <button class="${m.taken ? 'done' : 'taken'}"
-      onclick="markTaken(${i})"
-      ${m.taken ? "disabled" : ""}>
-      ${m.taken ? "Taken ✔" : "Take"}
-      </button>
+      <div class="med-info">
+        <span class="med-name">💊 ${m.name}</span>
+        <span class="med-time">🕐 ${m.time}</span>
+      </div>
+      ${m.taken
+        ? `<span class="badge taken">Taken ✓</span>`
+        : `<button class="btn-take" onclick="markTaken(${i})">Mark as Taken</button>`
+      }
     `;
-
     box.appendChild(div);
   });
 }
 
-/* MARK AS TAKEN */
-function markTaken(i){
-
-  meds[i].taken = true;
+function markTaken(i)
+{
+  medications[i].taken = true;
   renderMeds();
 
-  /* SEND TO GOOGLE SHEETS */
-  fetch(UPDATE_URL, {
-    method:"POST",
-    body: JSON.stringify({
-      index:i,
-      status:"taken"
-    })
-  });
+  // Browser notification confirmation
+  if ("Notification" in window && Notification.permission === "granted")
+  {
+    new Notification("✔ Medication Taken", {
+      body: medications[i].name + " marked as taken.",
+      icon: "ADJ.png"
+    });
+  }
 
-  alert("Medication marked as taken ✔");
+  // Toast notification
+  const box = document.getElementById("notifyBox");
+  box.innerText = "✔ " + medications[i].name + " marked as taken!";
+  box.style.background = "#22c55e";
+  box.style.display = "block";
+  setTimeout(() => box.style.display = "none", 3000);
 }
 
-/* NOTIFICATION SYSTEM */
-function notify(){
+function checkMedReminders()
+{
+  const now = new Date();
+  const currentTime = now.getHours().toString().padStart(2, '0') + ":" +
+                      now.getMinutes().toString().padStart(2, '0');
 
-  if("Notification" in window){
+  medications.forEach(m => {
+    if (!m.taken && m.time === currentTime)
+    {
+      // Browser notification
+      if ("Notification" in window && Notification.permission === "granted")
+      {
+        new Notification("💊 Medication Reminder", {
+          body: "Time to take: " + m.name,
+          icon: "ADJ.png"
+        });
+      }
 
-    if(Notification.permission === "granted"){
-      new Notification("💊 Medication Reminder",{
-        body:"Time to take your medication"
-      });
-    }else if(Notification.permission !== "denied"){
-      Notification.requestPermission();
+      // Toast fallback
+      const box = document.getElementById("notifyBox");
+      box.innerText = "💊 Time to take: " + m.name;
+      box.style.background = "#0ea5e9";
+      box.style.display = "block";
+      setTimeout(() => box.style.display = "none", 5000);
     }
+  });
+}
 
-  }else{
-    /* fallback */
-    const box = document.getElementById("notifyBox");
-    box.style.display = "block";
-    setTimeout(()=> box.style.display="none",3000);
+async function loadData()
+{
+  try
+  {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+
+    const bpm = data.bpm || 0;
+    const spo2 = data.spo2 || 0;
+    const temp = data.temp || 0;
+    const meds = data.meds || null;
+
+    applyCard("cardBPM", "hr", "subBPM", "bpm", bpm, "bpm");
+    applyCard("cardSPO2", "spo2", "subSPO2", "spo2", spo2, "%");
+    applyCard("cardTEMP", "temp", "subTEMP", "temp", temp, "°C");
+
+    updateStatusBanner(bpm, spo2, temp);
+
+    if (meds) medications = meds;
+    renderMeds();
+
+    document.getElementById("lastUpdated").innerText =
+      "Last updated: " + (data.timestamp || new Date().toLocaleTimeString());
+  }
+  catch (err)
+  {
+    document.getElementById("lastUpdated").innerText = "Connection error — retrying...";
+    renderMeds();
   }
 }
 
-/* RUN */
+// Start
 loadData();
-setInterval(loadData,5000);
-setInterval(notify,10000);
+setInterval(loadData, 5000);
+setInterval(checkMedReminders, 60000);
 
 </script>
-
 </body>
 </html>
