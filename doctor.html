@@ -234,92 +234,196 @@ const THRESHOLDS = {
 
 let hrChart, ecgChart;
 
-function initCharts(){
-  hrChart = new Chart(document.getElementById("hrChart"),{
-    type:"line",
-    data:{
-      labels:[],
-      datasets:[{
-        label:"Heart Rate (bpm)",
-        data:[],
-        borderColor:"#0ea5e9",
-        backgroundColor:"rgba(14,165,233,0.08)",
-        tension:0.4,
-        fill:true,
-        pointRadius:3,
-        pointBackgroundColor:"#0ea5e9"
+// Medication list stored in memory
+let medications = [
+  { name: "Aspirin", time: "08:00", taken: false },
+  { name: "Lisinopril", time: "14:00", taken: false },
+  { name: "Atorvastatin", time: "20:00", taken: false }
+];
+
+// Request notification permission on load
+if ("Notification" in window && Notification.permission !== "granted")
+{
+  Notification.requestPermission();
+}
+
+function addMed()
+{
+  const name = document.getElementById("medName").value.trim();
+  const time = document.getElementById("medTime").value;
+
+  if (!name || !time)
+  {
+    alert("Please enter both medication name and time.");
+    return;
+  }
+
+  medications.push({ name: name, time: time, taken: false });
+  document.getElementById("medName").value = "";
+  document.getElementById("medTime").value = "";
+  renderMeds();
+}
+
+function markTaken(index)
+{
+  medications[index].taken = true;
+  renderMeds();
+}
+
+function removeMed(index)
+{
+  medications.splice(index, 1);
+  renderMeds();
+}
+
+function renderMeds()
+{
+  const box = document.getElementById("meds");
+  if (medications.length === 0)
+  {
+    box.innerHTML = "<p style='color:#94a3b8;font-size:13px;'>No medications scheduled.</p>";
+    return;
+  }
+
+  box.innerHTML = "";
+  medications.forEach((m, i) => {
+    const div = document.createElement("div");
+    div.className = "med-row";
+    div.innerHTML = `
+      <span class="med-name">${m.name}</span>
+      <span class="med-time">${m.time}</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <span class="badge ${m.taken ? 'taken' : 'pending'}">${m.taken ? 'Taken ✓' : 'Pending'}</span>
+        ${!m.taken ? `<button onclick="markTaken(${i})"
+          style="padding:4px 8px;background:#22c55e;color:white;border:none;border-radius:6px;font-size:11px;cursor:pointer;">
+          Mark Taken</button>` : ''}
+        <button onclick="removeMed(${i})"
+          style="padding:4px 8px;background:#ef4444;color:white;border:none;border-radius:6px;font-size:11px;cursor:pointer;">
+          Remove</button>
+      </div>
+    `;
+    box.appendChild(div);
+  });
+}
+
+function checkMedReminders()
+{
+  const now = new Date();
+  const currentTime = now.getHours().toString().padStart(2, '0') + ":" +
+                      now.getMinutes().toString().padStart(2, '0');
+
+  medications.forEach(m => {
+    if (!m.taken && m.time === currentTime)
+    {
+      // Browser notification
+      if ("Notification" in window && Notification.permission === "granted")
+      {
+        new Notification("💊 Medication Reminder", {
+          body: "Time to take: " + m.name,
+          icon: "ADJ.png"
+        });
+      }
+
+      // Visual alert on dashboard
+      const banner = document.getElementById("alertBanner");
+      const text = document.getElementById("alertText");
+      banner.style.display = "flex";
+      text.innerText = "💊 Medication reminder — Time to take: " + m.name;
+    }
+  });
+}
+
+function initCharts()
+{
+  hrChart = new Chart(document.getElementById("hrChart"), {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [{
+        label: "Heart Rate (bpm)",
+        data: [],
+        borderColor: "#0ea5e9",
+        backgroundColor: "rgba(14,165,233,0.08)",
+        tension: 0.4,
+        fill: true,
+        pointRadius: 3,
+        pointBackgroundColor: "#0ea5e9"
       }]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      plugins:{legend:{labels:{color:"#64748b",font:{size:11}}}},
-      scales:{
-        x:{ticks:{color:"#94a3b8",font:{size:10}},grid:{color:"#f1f5f9"}},
-        y:{ticks:{color:"#94a3b8",font:{size:10}},grid:{color:"#f1f5f9"}}
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: "#64748b", font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { color: "#94a3b8", font: { size: 10 } }, grid: { color: "#f1f5f9" } },
+        y: { ticks: { color: "#94a3b8", font: { size: 10 } }, grid: { color: "#f1f5f9" } }
       }
     }
   });
 
-  ecgChart = new Chart(document.getElementById("ecgChart"),{
-    type:"line",
-    data:{
-      labels:[],
-      datasets:[{
-        label:"ECG Signal",
-        data:[],
-        borderColor:"#0ea5e9",
-        backgroundColor:"rgba(14,165,233,0.04)",
-        tension:0.2,
-        fill:true,
-        pointRadius:0,
-        borderWidth:1.5
+  ecgChart = new Chart(document.getElementById("ecgChart"), {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [{
+        label: "ECG Signal",
+        data: [],
+        borderColor: "#0ea5e9",
+        backgroundColor: "rgba(14,165,233,0.04)",
+        tension: 0.2,
+        fill: true,
+        pointRadius: 0,
+        borderWidth: 1.5
       }]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      animation:false,
-      plugins:{legend:{labels:{color:"#64748b",font:{size:11}}}},
-      scales:{
-        x:{ticks:{display:false},grid:{color:"#f1f5f9"}},
-        y:{ticks:{color:"#94a3b8",font:{size:10}},grid:{color:"#f1f5f9"}}
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      plugins: { legend: { labels: { color: "#64748b", font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { display: false }, grid: { color: "#f1f5f9" } },
+        y: { ticks: { color: "#94a3b8", font: { size: 10 } }, grid: { color: "#f1f5f9" } }
       }
     }
   });
 }
 
-function getStatus(type, value){
-  if(value === 0 || value === null) return "nodata";
-  if(type === "bpm"){
-    if(value < THRESHOLDS.bpmLow || value > THRESHOLDS.bpmHigh) return "critical";
-    if(value > 100) return "warning";
+function getStatus(type, value)
+{
+  if (value === 0 || value === null) return "nodata";
+  if (type === "bpm") {
+    if (value < THRESHOLDS.bpmLow || value > THRESHOLDS.bpmHigh) return "critical";
+    if (value > 100) return "warning";
     return "normal";
   }
-  if(type === "spo2"){
-    if(value < THRESHOLDS.spo2Low) return "critical";
-    if(value < THRESHOLDS.spo2Warn) return "warning";
+  if (type === "spo2") {
+    if (value < THRESHOLDS.spo2Low) return "critical";
+    if (value < THRESHOLDS.spo2Warn) return "warning";
     return "normal";
   }
-  if(type === "temp"){
-    if(value > THRESHOLDS.tempHigh) return "critical";
-    if(value > THRESHOLDS.tempWarn) return "warning";
+  if (type === "temp") {
+    if (value === 0) return "nodata";
+    if (value > THRESHOLDS.tempHigh) return "critical";
+    if (value > THRESHOLDS.tempWarn) return "warning";
     return "normal";
   }
   return "nodata";
 }
 
-function getSubText(type, status, value){
-  if(status === "nodata") return "Waiting for data...";
+function getSubText(type, status)
+{
+  if (status === "nodata") return "Waiting for data...";
   const labels = {
-    bpm:{normal:"✓ Normal — 60–100 bpm",warning:"⚠ Elevated — 60–100 bpm",critical:"⚠ Critical — 60–100 bpm"},
-    spo2:{normal:"✓ Normal — 95–100%",warning:"⚠ Low — 95–100%",critical:"⚠ Critical — 95–100%"},
-    temp:{normal:"✓ Normal — 36.1–37.2°C",warning:"⚠ Elevated — 36.1–37.2°C",critical:"⚠ Critical — 36.1–37.2°C"}
+    bpm: { normal: "✓ Normal — 60–100 bpm", warning: "⚠ Elevated — 60–100 bpm", critical: "⚠ Critical — 60–100 bpm" },
+    spo2: { normal: "✓ Normal — 95–100%", warning: "⚠ Low — 95–100%", critical: "⚠ Critical — 95–100%" },
+    temp: { normal: "✓ Normal — 36.1–37.2°C", warning: "⚠ Elevated — 36.1–37.2°C", critical: "⚠ Critical — 36.1–37.2°C" }
   };
   return labels[type][status];
 }
 
-function applyCard(cardId, valueId, subId, type, value, unit){
+function applyCard(cardId, valueId, subId, type, value, unit)
+{
   const status = getStatus(type, value);
   const card = document.getElementById(cardId);
   const valueEl = document.getElementById(valueId);
@@ -327,22 +431,23 @@ function applyCard(cardId, valueId, subId, type, value, unit){
 
   card.className = "card " + status;
   valueEl.innerHTML = (value === 0 ? "--" : value) + `<span class="card-unit">${unit}</span>`;
-  subEl.innerText = getSubText(type, status, value);
+  subEl.innerText = getSubText(type, status);
 }
 
-function checkAlerts(bpm, spo2, temp){
+function checkAlerts(bpm, spo2, temp)
+{
   const banner = document.getElementById("alertBanner");
   const text = document.getElementById("alertText");
   let alerts = [];
 
-  if(bpm > 0 && (bpm < THRESHOLDS.bpmLow || bpm > THRESHOLDS.bpmHigh))
+  if (bpm > 0 && (bpm < THRESHOLDS.bpmLow || bpm > THRESHOLDS.bpmHigh))
     alerts.push("Heart Rate: " + bpm + " bpm");
-  if(spo2 > 0 && spo2 < THRESHOLDS.spo2Low)
+  if (spo2 > 0 && spo2 < THRESHOLDS.spo2Low)
     alerts.push("SpO₂: " + spo2 + "%");
-  if(temp > 0 && temp > THRESHOLDS.tempHigh)
+  if (temp > 0 && temp > THRESHOLDS.tempHigh)
     alerts.push("Temperature: " + temp + "°C");
 
-  if(alerts.length > 0){
+  if (alerts.length > 0) {
     banner.style.display = "flex";
     text.innerText = "Abnormal readings detected — " + alerts.join(" | ");
   } else {
@@ -350,23 +455,9 @@ function checkAlerts(bpm, spo2, temp){
   }
 }
 
-function renderMeds(meds){
-  const box = document.getElementById("meds");
-  box.innerHTML = "";
-  meds.forEach(m => {
-    const div = document.createElement("div");
-    div.className = "med-row";
-    div.innerHTML = `
-      <span class="med-name">${m.name}</span>
-      <span class="med-time">${m.time}</span>
-      <span class="badge ${m.taken ? 'taken' : 'pending'}">${m.taken ? 'Taken ✓' : 'Pending'}</span>
-    `;
-    box.appendChild(div);
-  });
-}
-
-async function loadData(){
-  try{
+async function loadData()
+{
+  try {
     const res = await fetch(API_URL);
     const data = await res.json();
 
@@ -375,35 +466,35 @@ async function loadData(){
     const temp = data.temp || 0;
     const ecg = data.ecg || [];
     const bpmTrend = data.bpmTrend || [];
-    const meds = data.meds || [];
 
-    applyCard("cardBPM","hr","subBPM","bpm",bpm,"bpm");
-    applyCard("cardSPO2","spo2","subSPO2","spo2",spo2,"%");
-    applyCard("cardTEMP","temp","subTEMP","temp",temp,"°C");
+    applyCard("cardBPM", "hr", "subBPM", "bpm", bpm, "bpm");
+    applyCard("cardSPO2", "spo2", "subSPO2", "spo2", spo2, "%");
+    applyCard("cardTEMP", "temp", "subTEMP", "temp", temp, "°C");
 
     checkAlerts(bpm, spo2, temp);
 
-    hrChart.data.labels = bpmTrend.map((_,i) => i+1);
+    hrChart.data.labels = bpmTrend.map((_, i) => i + 1);
     hrChart.data.datasets[0].data = bpmTrend;
     hrChart.update();
 
-    ecgChart.data.labels = ecg.map((_,i) => i+1);
+    ecgChart.data.labels = ecg.map((_, i) => i + 1);
     ecgChart.data.datasets[0].data = ecg;
     ecgChart.update();
-
-    renderMeds(meds);
 
     document.getElementById("lastUpdated").innerText =
       "Last updated: " + (data.timestamp || new Date().toLocaleTimeString());
 
-  } catch(err){
+  } catch (err) {
     document.getElementById("lastUpdated").innerText = "Connection error — retrying...";
   }
 }
 
+// Start everything
 initCharts();
+renderMeds();
 loadData();
 setInterval(loadData, 5000);
+setInterval(checkMedReminders, 60000); // Check reminders every minute
 
 </script>
 </body>
